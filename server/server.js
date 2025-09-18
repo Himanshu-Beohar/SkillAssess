@@ -15,6 +15,8 @@ const resultRoutes = require('./routes/results');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.set("trust proxy", 1); // trust first proxy (Railway, Heroku, etc.)
+
 // Security middleware
 //app.use(helmet());
 

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Updated CSP Meta Tag -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' https://checkout.razorpay.com https://api.razorpay.com 'unsafe-inline' 'unsafe-eval';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://maxcdn.bootstrapcdn.com;
+        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://maxcdn.bootstrapcdn.com;
+        connect-src 'self' http://localhost:3000 https://api.razorpay.com https://checkout.razorpay.com https://lumberjack.razorpay.com;
+        frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com;
+        img-src 'self' data: https://*.razorpay.com;
+    ">
+    <title>SkillAssess - Online Assessment Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header will be dynamically loaded -->
+        <header id="header"></header>
+
+        <!-- Main content area -->
+        <main class="container">
+            <!-- Pages will be dynamically loaded here -->
+            <div id="page-content"></div>
+        </main>
+
+        <!-- Footer will be dynamically loaded -->
+        <footer id="footer"></footer>
+
+        <!-- Loading overlay -->
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <!-- Notification system -->
+        <div id="notification-container" class="notification-container"></div>
+    </div>
+
+    <!-- Razorpay checkout script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    
+    <!-- Application scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/components/header.js"></script>
+    <script src="js/components/footer.js"></script>
+    <script src="js/pages/login.js"></script>
+    <script src="js/pages/register.js"></script>
+    <script src="js/pages/home.js"></script>
+    <script src="js/pages/assessments.js"></script>
+    <script src="js/pages/assessment.js"></script>
+    <script src="js/pages/payment.js"></script>
+    <script src="js/pages/results.js"></script>
+    <script src="js/pages/profile.js"></script>
+    <script src="js/app.js"></script>
+
+    <script>
+        // Debug script to help identify CSP issues
+        console.log("SkillAssess application loading with updated CSP policy");
+        
+        // Listen for security policy violations
+        document.addEventListener('securitypolicyviolation', function(e) {
+            console.warn('CSP VIOLATION:', e.blockedURI, 'violated directive:', e.violatedDirective);
+        });
+    </script>
+</body>
+</html>

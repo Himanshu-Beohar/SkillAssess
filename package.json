@@ -1,0 +1,27 @@
+{
+  "name": "skillassess",
+  "version": "1.0.0",
+  "description": "Online assessment platform with Razorpay integration",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "install-deps": "npm install && cd server && npm install"
+  },
+  "keywords": [
+    "assessment",
+    "quiz",
+    "razorpay",
+    "nodejs",
+    "postgresql"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "razorpay": "^2.9.6"
+  }
+}

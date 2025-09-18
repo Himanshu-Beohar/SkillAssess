@@ -58,8 +58,9 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Static files
-app.use(express.static(path.join(__dirname, '../public')));
+// ✅ Serve React frontend (client/build)
+const clientBuildPath = path.join(__dirname, '../client/build');
+app.use(express.static(clientBuildPath));
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -76,9 +77,9 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Frontend fallback
+// ✅ Frontend fallback (must come after API routes)
 app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 
 // Error handling
@@ -90,9 +91,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
+// 404 handler (only for APIs, not frontend)
 app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Endpoint not found' });
+  }
+  res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 
 // ✅ Start server ONCE

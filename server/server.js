@@ -14,6 +14,9 @@ const resultRoutes = require('./routes/results');
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`✅ Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+});
 
 app.set("trust proxy", 1); // trust first proxy (Railway, Heroku, etc.)
 

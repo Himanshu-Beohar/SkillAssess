@@ -18,7 +18,7 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
 });
 
-app.set("trust proxy", 1); // trust first proxy (Railway, Heroku, etc.)
+app.set("trust proxy", 1); // trust a first proxy (Railway, Heroku, etc.)
 
 // Security middleware
 //app.use(helmet());

@@ -1,8 +1,14 @@
 // Application configuration
+// const config = {
+//     API_BASE_URL: window.location.origin.includes('localhost') 
+//         ? 'http://localhost:3000/api' 
+//         : '/api',
+
 const config = {
     API_BASE_URL: window.location.origin.includes('localhost') 
         ? 'http://localhost:3000/api' 
-        : '/api',
+        : `${window.location.origin}/api`,
+
     
     ROUTES: {
         HOME: '/',

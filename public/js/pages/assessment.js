@@ -188,6 +188,45 @@ const assessmentPage = {
         }
     },
 
+    // async submitAssessment() {
+    //     // Check unanswered
+    //     const unansweredQuestions = this.userAnswers.filter(answer => answer === undefined);
+    //     if (unansweredQuestions.length > 0) {
+    //         const confirmSubmit = confirm('You have unanswered questions. Are you sure you want to submit?');
+    //         if (!confirmSubmit) return;
+    //     }
+
+    //     try {
+    //         utils.showLoading('Submitting assessment...');
+            
+    //         const response = await api.post('/results/submit', {
+    //             assessment_id: this.currentAssessment.id,
+    //             answers: this.questions.map((question, index) => ({
+    //                 question_id: question.id,
+    //                 selected_answer: this.userAnswers[index] !== undefined ? this.userAnswers[index] : -1
+    //             })),
+    //             time_taken: this.timeTaken
+    //         });
+
+    //         if (response.success) {
+    //             this.stopTimer();
+    //             utils.showNotification('Assessment submitted successfully!', 'success');
+    //             router.navigateTo('/results', {
+    //                 assessmentId: this.currentAssessment.id,
+    //                 result: response.data.result,
+    //                 detailedResults: response.data.detailed_results
+    //             });
+    //         } else {
+    //             throw new Error(response.error || 'Failed to submit assessment');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error submitting assessment:', error);
+    //         utils.showNotification(error.message, 'error');
+    //     } finally {
+    //         utils.hideLoading();
+    //     }
+    // }
+
     async submitAssessment() {
         // Check unanswered
         const unansweredQuestions = this.userAnswers.filter(answer => answer === undefined);
@@ -211,8 +250,15 @@ const assessmentPage = {
             if (response.success) {
                 this.stopTimer();
                 utils.showNotification('Assessment submitted successfully!', 'success');
-                router.navigateTo('/results', {
-                    assessmentId: this.currentAssessment.id,
+                
+                // FIX: Pass the data correctly to results page
+                // router.navigateTo(config.ROUTES.RESULTS, {
+                //     result: response.data.result,
+                //     detailedResults: response.data.detailed_results
+                // });
+
+                // In submitAssessment():
+                router.navigateTo('/assessment-result', {
                     result: response.data.result,
                     detailedResults: response.data.detailed_results
                 });

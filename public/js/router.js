@@ -14,7 +14,10 @@ const router = {
             [config.ROUTES.PROFILE]: profilePage,
             [config.ROUTES.RESULTS]: resultsPage,
             '/assessment/:id': assessmentPage,
-            '/payment/:id': paymentPage
+            '/payment/:id': paymentPage,
+            //[config.ROUTES.RESULTS]: resultsPage, // All results history
+            '/result/:id': singleResultPage,      // Single result view
+            '/assessment-result': assessmentResultPage // New assessment result
         };
 
         // Handle browser back/forward

@@ -41,25 +41,55 @@ const auth = {
     },
 
     // Login user
-    async login(email, password) {
-        try {
-            utils.showLoading('Signing in...');
-            const response = await api.post('/auth/login', { email, password });
+    // async login(email, password) {
+    //     try {
+    //         utils.showLoading('Signing in...');
+    //         const response = await api.post('/auth/login', { email, password });
             
-            if (response.success) {
-                this.saveAuthData(response.data.token, response.data.user);
-                utils.showNotification('Login successful!', 'success');
-                return response;
-            } else {
-                throw new Error(response.error || 'Login failed');
+    //         if (response.success) {
+    //             this.saveAuthData(response.data.token, response.data.user);
+    //             utils.showNotification('Login successful!', 'success');
+    //             return response;
+    //         } else {
+    //             throw new Error(response.error || 'Login failed');
+    //         }
+    //     } catch (error) {
+    //         utils.showNotification(error.message, 'error');
+    //         throw error;
+    //     } finally {
+    //         utils.hideLoading();
+    //     }
+    // },
+
+    // Login function
+async login(email, password) {
+    try {
+        utils.showLoading('Signing in...');
+        const response = await api.post('/auth/login', { email, password });
+        
+        if (response.success) {
+            this.saveAuthData(response.data.token, response.data.user);
+            utils.showNotification('Login successful!', 'success');
+            
+            // Update the header to show authenticated state
+            if (typeof headerComponent !== 'undefined') {
+                await headerComponent.updateAuthState();
             }
-        } catch (error) {
-            utils.showNotification(error.message, 'error');
-            throw error;
-        } finally {
-            utils.hideLoading();
+            
+            // Redirect to home page
+            router.navigateTo(config.ROUTES.HOME);
+            
+            return response;
+        } else {
+            throw new Error(response.error || 'Login failed');
         }
-    },
+    } catch (error) {
+        utils.showNotification(error.message, 'error');
+        throw error;
+    } finally {
+        utils.hideLoading();
+    }
+},
 
     // Register user
     async register(userData) {
@@ -84,9 +114,21 @@ const auth = {
 
     // Logout user
     logout() {
-        this.clearAuthData();
-        utils.showNotification('Logged out successfully', 'info');
-        router.navigateTo(config.ROUTES.HOME);
+        const confirmLogout = confirm('Are you sure you want to logout?');
+        
+        if (confirmLogout) {
+            this.clearAuthData();
+            utils.showNotification('Logged out successfully', 'info');
+            
+            // Update header and redirect
+            if (typeof headerComponent !== 'undefined') {
+                headerComponent.updateAuthState().then(() => {
+                    router.navigateTo(config.ROUTES.HOME);
+                });
+            } else {
+                router.navigateTo(config.ROUTES.HOME);
+            }
+        }
     },
 
     // Update user profile

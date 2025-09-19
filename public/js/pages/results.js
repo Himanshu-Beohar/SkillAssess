@@ -1,187 +1,325 @@
-// Results page
+// Results page - Modern All Results View
 const resultsPage = {
-    currentResult: null,
-    detailedResults: null,
-    assessment: null,
+    results: [],
+    filters: {
+        sortBy: 'newest',
+        status: 'all'
+    },
 
     async load(data) {
-        if (data && data.result) {
-            // Coming from assessment submission
-            this.currentResult = data.result;
-            this.detailedResults = data.detailedResults;
-            this.showResults();
-        } else {
-            // Load from API
+        try {
+            utils.showLoading('Loading your results...');
             await this.loadResults();
+        } catch (error) {
+            console.error('Error loading results:', error);
+            this.showError();
         }
     },
 
     async loadResults() {
         try {
-            utils.showLoading('Loading results...');
             const response = await api.get('/results/my-results');
             
             if (response.success && response.data.results.length > 0) {
-                // Show results list
-                this.showResultsList(response.data.results);
+                this.results = response.data.results;
+                this.renderModernResults();
             } else {
-                this.showNoResults();
+                this.showEmptyState();
             }
         } catch (error) {
-            console.error('Error loading results:', error);
-            utils.showNotification(error.message, 'error');
-            this.showNoResults();
+            console.error('Error fetching results:', error);
+            utils.showNotification('Failed to load results', 'error');
+            this.showError();
         } finally {
             utils.hideLoading();
         }
     },
 
-    showResultsList(results) {
+    renderModernResults() {
+        const filteredResults = this.filterResults();
         const html = `
-            <div class="page-container">
-                <div class="page-header">
-                    <h1>Your Assessment Results</h1>
-                    <p>View your performance across all assessments</p>
-                </div>
-
-                <div class="results-list">
-                    ${results.map(result => `
-                        <div class="result-item" onclick="resultsPage.viewResult(${result.id})">
-                            <div class="result-header">
-                                <h3>${result.assessment_title}</h3>
-                                <span class="score-badge ${this.getScoreClass(result.score, result.total_questions)}">
-                                    ${Math.round((result.score / result.total_questions) * 100)}%
-                                </span>
+            <div class="modern-results-container">
+                <!-- Modern Header -->
+                <div class="modern-results-header">
+                    <div class="header-main">
+                        <div class="header-text">
+                            <h1 class="header-title">Assessment History</h1>
+                            <p class="header-subtitle">Track your learning journey and performance metrics</p>
+                        </div>
+                        <div class="header-stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-value">${this.results.length}</span>
+                                    <span class="stat-label">Total Attempts</span>
+                                </div>
                             </div>
-                            <div class="result-details">
-                                <p>Score: ${result.score}/${result.total_questions}</p>
-                                <p>Time: ${utils.formatTime(result.time_taken)}</p>
-                                <p>Date: ${utils.formatDate(result.completed_at)}</p>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-value">${this.calculateAverageScore()}%</span>
+                                    <span class="stat-label">Avg. Score</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <span class="stat-value">${this.calculateSuccessRate()}%</span>
+                                    <span class="stat-label">Success Rate</span>
+                                </div>
                             </div>
                         </div>
-                    `).join('')}
+                    </div>
+                    
+                    <div class="header-achievement">
+                        <div class="achievement-badge">
+                            <i class="fas fa-star"></i>
+                            <span>${this.getPerformanceLevel()}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rest of your content remains the same -->
+                <div class="results-filters">
+                <!-- ... filters code ... -->
+                </div>
+            </div>
+
+                <!-- Filters -->
+                <div class="results-filters">
+                    <div class="filter-group">
+                        <label>Sort by:</label>
+                        <select class="filter-select" id="sort-filter">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="highest">Highest Score</option>
+                            <option value="lowest">Lowest Score</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Status:</label>
+                        <select class="filter-select" id="status-filter">
+                            <option value="all">All Results</option>
+                            <option value="passed">Passed Only</option>
+                            <option value="failed">Failed Only</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-outline" onclick="resultsPage.applyFilters()">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                </div>
+
+                <!-- Results Grid -->
+                <div class="results-grid">
+                    ${filteredResults.map(result => this.renderResultCard(result)).join('')}
+                </div>
+
+                <!-- Pagination (if needed) -->
+                ${this.results.length > 10 ? `
+                <div class="pagination">
+                    <button class="pagination-btn" disabled>Previous</button>
+                    <span class="pagination-info">Page 1 of 1</span>
+                    <button class="pagination-btn" disabled>Next</button>
+                </div>
+                ` : ''}
+            </div>
+        `;
+
+        document.getElementById('page-content').innerHTML = html;
+        this.addEventListeners();
+    },
+
+    renderResultCard(result) {
+        const percentage = Math.round((result.score / result.total_questions) * 100);
+        const passed = percentage >= 60;
+        const scoreClass = passed ? 'excellent' : (percentage >= 40 ? 'average' : 'poor');
+        const timeTaken = result.time_taken ? this.formatTime(result.time_taken) : 'N/A';
+
+        return `
+            <div class="result-card ${passed ? 'passed' : 'failed'}" onclick="resultsPage.viewResult(${result.id})">
+                <div class="card-header">
+                    <h3 class="assessment-title">${result.assessment_title}</h3>
+                    <div class="status-badge ${passed ? 'passed' : 'failed'}">
+                        ${passed ? 'Passed' : 'Failed'}
+                    </div>
+                </div>
+                
+                <div class="card-content">
+                    <div class="score-display">
+                        <div class="circular-progress ${scoreClass}" style="--percentage: ${percentage}%">
+                            <span class="score-value">${percentage}%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-details">
+                        <div class="detail-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>${result.score}/${result.total_questions} Correct</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${timeTaken}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>${new Date(result.completed_at).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn btn-outline btn-sm" onclick="event.stopPropagation(); resultsPage.viewResult(${result.id})">
+                        View Details
+                    </button>
+                    ${passed ? `
+                    <button class="btn btn-sm certificate-btn" onclick="event.stopPropagation(); resultsPage.downloadCertificate(${result.id})">
+                        <i class="fas fa-download"></i> Certificate
+                    </button>
+                    ` : ''}
                 </div>
             </div>
         `;
+    },
+
+    // Add these methods to your resultsPage object
+    calculateSuccessRate() {
+        if (this.results.length === 0) return 0;
+        const passedCount = this.results.filter(result => {
+            const percentage = Math.round((result.score / result.total_questions) * 100);
+            return percentage >= 60;
+        }).length;
+        return Math.round((passedCount / this.results.length) * 100);
+    },
+
+    getPerformanceLevel() {
+        const successRate = this.calculateSuccessRate();
+        if (successRate >= 80) return 'Expert Level';
+        if (successRate >= 60) return 'Advanced';
+        if (successRate >= 40) return 'Intermediate';
+        return 'Beginner';
+    },
+
+    filterResults() {
+        let filtered = [...this.results];
+
+        // Status filter
+        if (this.filters.status === 'passed') {
+            filtered = filtered.filter(result => {
+                const percentage = Math.round((result.score / result.total_questions) * 100);
+                return percentage >= 60;
+            });
+        } else if (this.filters.status === 'failed') {
+            filtered = filtered.filter(result => {
+                const percentage = Math.round((result.score / result.total_questions) * 100);
+                return percentage < 60;
+            });
+        }
+
+        // Sort filter
+        switch (this.filters.sortBy) {
+            case 'newest':
+                filtered.sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
+                break;
+            case 'oldest':
+                filtered.sort((a, b) => new Date(a.completed_at) - new Date(b.completed_at));
+                break;
+            case 'highest':
+                filtered.sort((a, b) => (b.score / b.total_questions) - (a.score / a.total_questions));
+                break;
+            case 'lowest':
+                filtered.sort((a, b) => (a.score / a.total_questions) - (b.score / b.total_questions));
+                break;
+        }
+
+        return filtered;
+    },
+
+    calculateAverageScore() {
+        if (!this.results || this.results.length === 0) return 0;
         
-        document.getElementById('page-content').innerHTML = html;
+        const validResults = this.results.filter(result => 
+            result && 
+            typeof result.score === 'number' && 
+            typeof result.total_questions === 'number' && 
+            result.total_questions > 0
+        );
+        
+        if (validResults.length === 0) return 0;
+        
+        const totalPercentage = validResults.reduce((sum, result) => {
+            return sum + (result.score / result.total_questions) * 100;
+        }, 0);
+        
+        return Math.round(totalPercentage / validResults.length);
+    },
+
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}m ${secs}s`;
+    },
+
+    addEventListeners() {
+        // Filter change listeners
+        document.getElementById('sort-filter').value = this.filters.sortBy;
+        document.getElementById('status-filter').value = this.filters.status;
+
+        document.getElementById('sort-filter').addEventListener('change', (e) => {
+            this.filters.sortBy = e.target.value;
+        });
+
+        document.getElementById('status-filter').addEventListener('change', (e) => {
+            this.filters.status = e.target.value;
+        });
+    },
+
+    applyFilters() {
+        this.renderModernResults();
     },
 
     async viewResult(resultId) {
-        try {
-            utils.showLoading('Loading result details...');
-            const response = await api.get(`/results/${resultId}`);
-            
-            if (response.success) {
-                this.currentResult = response.data.result;
-                await this.loadAssessmentDetails();
-            } else {
-                throw new Error(response.error || 'Failed to load result details');
-            }
-        } catch (error) {
-            console.error('Error loading result:', error);
-            utils.showNotification(error.message, 'error');
-        } finally {
-            utils.hideLoading();
-        }
+        router.navigateTo(`/result/${resultId}`);
     },
 
-    async loadAssessmentDetails() {
-        try {
-            const response = await api.get(`/assessments/${this.currentResult.assessment_id}`);
-            if (response.success) {
-                this.assessment = response.data.assessment;
-                this.showDetailedResults();
-            }
-        } catch (error) {
-            console.error('Error loading assessment details:', error);
-        }
+    downloadCertificate(resultId) {
+        utils.showNotification('Certificate download will be available soon!', 'info');
     },
 
-    showDetailedResults() {
-        const percentage = Math.round((this.currentResult.score / this.currentResult.total_questions) * 100);
-        
+    showEmptyState() {
         const html = `
-            <div class="page-container">
-                <div class="result-header">
-                    <h1>Assessment Results</h1>
-                    <h2>${this.assessment?.title || 'Assessment'}</h2>
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-clipboard-list"></i>
                 </div>
-
-                <div class="result-summary">
-                    <div class="score-circle ${this.getScoreClass(this.currentResult.score, this.currentResult.total_questions)}">
-                        <span class="score-percentage">${percentage}%</span>
-                    </div>
-                    <div class="result-stats">
-                        <p><strong>Score:</strong> ${this.currentResult.score}/${this.currentResult.total_questions}</p>
-                        <p><strong>Time Taken:</strong> ${utils.formatTime(this.currentResult.time_taken)}</p>
-                        <p><strong>Date Completed:</strong> ${utils.formatDate(this.currentResult.completed_at)}</p>
-                    </div>
-                </div>
-
-                ${this.detailedResults ? this.renderQuestionResults() : ''}
-
-                <div class="result-actions">
-                    <button class="btn btn-primary" onclick="router.navigateTo(config.ROUTES.ASSESSMENTS)">
-                        Take Another Assessment
-                    </button>
-                    <button class="btn btn-outline" onclick="resultsPage.loadResults()">
-                        Back to Results List
-                    </button>
-                </div>
+                <h2>No Results Yet</h2>
+                <p>You haven't taken any assessments yet. Start your learning journey today!</p>
+                <button class="btn btn-primary" onclick="router.navigateTo('${config.ROUTES.ASSESSMENTS}')">
+                    Browse Assessments
+                </button>
             </div>
         `;
-        
         document.getElementById('page-content').innerHTML = html;
     },
 
-    renderQuestionResults() {
-        return `
-            <div class="detailed-results">
-                <h3>Question-wise Results</h3>
-                ${this.detailedResults.map((result, index) => `
-                    <div class="question-result ${result.is_correct ? 'correct' : 'incorrect'}">
-                        <div class="question-header">
-                            <span class="question-number">Q${index + 1}</span>
-                            <span class="result-status">
-                                ${result.is_correct ? '✓ Correct' : '✗ Incorrect'}
-                            </span>
-                        </div>
-                        <p class="question-text">${result.question_text}</p>
-                        <div class="answer-comparison">
-                            <p><strong>Your answer:</strong> ${result.options[result.selected_answer]}</p>
-                            ${!result.is_correct ? `
-                                <p><strong>Correct answer:</strong> ${result.options[result.correct_answer]}</p>
-                            ` : ''}
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    },
-
-    getScoreClass(score, total) {
-        const percentage = (score / total) * 100;
-        if (percentage >= 80) return 'excellent';
-        if (percentage >= 60) return 'good';
-        if (percentage >= 40) return 'average';
-        return 'poor';
-    },
-
-    showNoResults() {
+    showError() {
         const html = `
-            <div class="page-container">
-                <div class="empty-state">
-                    <i class="fas fa-clipboard-list"></i>
-                    <h2>No Results Yet</h2>
-                    <p>You haven't taken any assessments yet. Start your first assessment to see your results here.</p>
-                    <button class="btn btn-primary" onclick="router.navigateTo(config.ROUTES.ASSESSMENTS)">
-                        Browse Assessments
-                    </button>
+            <div class="error-state">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
                 </div>
+                <h2>Something went wrong</h2>
+                <p>We couldn't load your results. Please try again later.</p>
+                <button class="btn btn-primary" onclick="resultsPage.loadResults()">
+                    Try Again
+                </button>
             </div>
         `;
-        
         document.getElementById('page-content').innerHTML = html;
     }
 };

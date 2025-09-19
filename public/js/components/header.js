@@ -38,6 +38,20 @@ const headerComponent = {
         // Add click event listeners to nav links
         this.addNavEventListeners();
         
+        // Add logout button listener - ADD THIS LINE
+        this.addEventListener();
+    },
+
+    // Update authentication state
+    async updateAuthState() {
+        // Clear the current header
+        document.getElementById('header').innerHTML = '';
+        
+        // Re-render the header
+        await this.load();
+        
+        // Re-attach all event listeners
+        this.addEventListeners();
     },
 
     // Add navigation event listeners
@@ -55,7 +69,14 @@ const headerComponent = {
     addEventListener() {
         const logoutButton = document.querySelector('.logout-button');
         if (logoutButton) {
-            logoutButton.addEventListener('click', () => {
+            // Remove any existing listeners first to prevent duplicates
+            const newLogoutButton = logoutButton.cloneNode(true);
+            logoutButton.parentNode.replaceChild(newLogoutButton, logoutButton);
+            
+            // Add click event to the new button
+            newLogoutButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 auth.logout();
             });
         }
@@ -63,6 +84,6 @@ const headerComponent = {
 
     // Update authentication state
     updateAuthState() {
-        this.load();
+        return this.load();
     }
 };

@@ -34,12 +34,10 @@ const assessmentResultPage = {
                 </div>
 
                 <!-- Score Summary -->
-                <div class="score-summary">
-                    <div class="circular-progress ${scoreClass}" data-percentage="${percentage}">
-                        <div class="progress-circle">
-                            <span class="progress-value">${percentage}%</span>
-                        </div>
-                    </div>
+                <div class="circular-progress ${scoreClass}" data-percentage="${percentage}">
+                    <div class="progress-circle"></div>
+                    <span class="progress-value">${percentage}%</span>
+                </div>
                     
                     <div class="score-details">
                         <h2>Performance Summary</h2>

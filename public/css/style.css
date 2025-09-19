@@ -958,7 +958,7 @@ footer {
     align-items: center;
 }
 
-.circular-progress {
+/* .circular-progress {
     width: 200px;
     height: 200px;
     margin: 0 auto;
@@ -979,7 +979,48 @@ footer {
     font-size: 2.5rem;
     font-weight: bold;
     color: var(--dark);
+} */
+
+.circular-progress {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    position: relative;
 }
+
+.progress-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 70%;
+    background: conic-gradient(var(--primary) 0%, var(--light-gray) 0%);
+    position: relative;
+}
+
+/* White inner circle (makes it look like a ring) */
+.progress-circle::after {
+    content: "";
+    position: absolute;
+    width: 85%;   /* adjust this → more % = bigger white center */
+    height: 85%;
+    background: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.progress-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.8rem;  /* smaller font so it stays inside */
+    font-weight: bold;
+    color: var(--dark);
+    white-space: nowrap;
+    z-index: 1;
+}
+
 
 .score-details h2 {
     margin-bottom: 1.5rem;

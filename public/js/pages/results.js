@@ -284,7 +284,19 @@ const resultsPage = {
     },
 
     async viewResult(resultId) {
-        router.navigateTo(`/result/${resultId}`);
+        try {
+            console.log('Viewing result:', resultId);
+            
+            // Show loading state
+            utils.showLoading('Loading result details...');
+            
+            // Navigate to single result page
+            await router.navigateTo(`/result/${resultId}`);
+            
+        } catch (error) {
+            console.error('Error navigating to result:', error);
+            utils.showNotification('Failed to load result details', 'error');
+        }
     },
 
     downloadCertificate(resultId) {

@@ -69,6 +69,73 @@ const assessmentController = {
     }
   },
 
+  async startAssessment(req, res) {
+        try {
+            const { id } = req.params;
+            const userId = req.user.id;
+
+            // Get assessment details
+            const assessment = await Assessment.findById(id);
+            if (!assessment) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Assessment not found'
+                });
+            }
+
+            // Check access for premium assessments
+            if (assessment.is_premium) {
+                const hasAccess = await Payment.verifyUserAccess(userId, id);
+                if (!hasAccess) {
+                    return res.status(403).json({
+                        success: false,
+                        error: 'Payment required to access this assessment'
+                    });
+                }
+            }
+
+            // Get randomized questions based on difficulty distribution
+            const questions = await Assessment.getQuestionsWithDifficulty(
+                id, 
+                assessment.num_questions
+            );
+
+            if (questions.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'No questions available for this assessment'
+                });
+            }
+
+            // Parse options from JSON string if needed
+            const formattedQuestions = questions.map(question => ({
+                ...question,
+                options: typeof question.options === 'string' 
+                    ? JSON.parse(question.options) 
+                    : question.options
+            }));
+
+            res.json({
+                success: true,
+                data: {
+                    assessment: {
+                        ...assessment,
+                        time_limit: assessment.time_limit
+                    },
+                    questions: formattedQuestions,
+                    time_limit: assessment.time_limit * 60 // Convert to seconds
+                }
+            });
+
+        } catch (error) {
+            console.error('Error starting assessment:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to start assessment'
+            });
+        }
+    },
+
   async getAssessment(req, res) {
     try {
       const { id } = req.params;

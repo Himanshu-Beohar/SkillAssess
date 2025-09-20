@@ -14,5 +14,6 @@ router.put('/:id', authenticateToken, assessmentController.updateAssessment);
 router.delete('/:id', authenticateToken, assessmentController.deleteAssessment);
 router.post('/:assessment_id/questions', authenticateToken, assessmentController.addQuestion);
 router.get('/user/my-assessments', authenticateToken, assessmentController.getUserAssessments);
+router.get('/:id/start', authenticateToken, assessmentController.startAssessment);
 
 module.exports = router;

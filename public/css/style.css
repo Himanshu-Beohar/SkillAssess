@@ -2935,3 +2935,250 @@ footer {
 .ultra-modern-pay-btn.success {
     animation: successPulse 0.6s ease;
 }
+
+/* Timer Styles */
+.timer-container {
+    text-align: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    color: white;
+    border-radius: 15px;
+    min-width: 120px;
+}
+
+.timer-display {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+}
+
+.timer-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-top: 0.3rem;
+}
+
+/* Progress and difficulty styles */
+.assessment-progress {
+    margin: 1.5rem 0;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.difficulty {
+    color: #ffd700; /* Gold color for stars */
+}
+
+/* Time warning */
+.time-warning {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #ffba08, #f48c06);
+    color: white;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+/* Animations */
+.pulse {
+    animation: pulse 1s infinite;
+}
+
+.shake {
+    animation: shake 0.5s ease;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Scope to recent-results only */
+.recent-results .result-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recent-results .result-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.recent-results .result-info {
+  flex: 1;
+}
+
+.recent-results .result-info h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.recent-results .result-info p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Score badge only inside recent results */
+.recent-results .score-badge {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.recent-results .score-excellent { background: #2ecc71; }  
+.recent-results .score-good { background: #3498db; }       
+.recent-results .score-average { background: #f39c12; }    
+.recent-results .score-poor { background: #e74c3c; }       
+
+/* Scope only to profile page */
+.profile-content {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Profile Cards */
+.profile-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.profile-card h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1.2rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Forms */
+.profile-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.profile-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-form label {
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.profile-form .form-control {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  font-size: 1rem;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-form .form-control:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52,152,219,0.15);
+  outline: none;
+  background: #fff;
+}
+
+/* Buttons */
+.profile-form .btn {
+  margin-top: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.profile-form .btn-primary {
+  background: #3498db;
+  color: #fff;
+  border: none;
+}
+
+.profile-form .btn-primary:hover {
+  background: #2980b9;
+}
+
+/* Statistics Section */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+  gap: 1.5rem;
+}
+
+.stat-item {
+  background: linear-gradient(135deg,#3498db,#9b59b6);
+  border-radius: 14px;
+  padding: 1.5rem;
+  color: #fff;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.stat-item i {
+  font-size: 2rem;
+  margin-bottom: 0.8rem;
+}
+
+.stat-number {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  font-weight: 400;
+  opacity: 0.9;
+}

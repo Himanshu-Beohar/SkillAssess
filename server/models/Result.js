@@ -68,6 +68,22 @@ class Result {
     await query('DELETE FROM results WHERE id = $1', [resultId]);
     return true;
   }
+
+  static async findById(id) {
+    try {
+        const result = await query(`
+            SELECT r.*, a.title as assessment_title 
+            FROM results r 
+            LEFT JOIN assessments a ON r.assessment_id = a.id 
+            WHERE r.id = $1
+        `, [id]);
+        
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error finding result by ID:', error);
+        throw error;
+    }
+  }
 }
 
 module.exports = Result;

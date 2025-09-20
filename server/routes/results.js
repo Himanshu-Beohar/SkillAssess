@@ -7,11 +7,11 @@ const { authenticateToken } = require('../middleware/auth');
 router.post('/submit', authenticateToken, resultController.submitAssessment);
 router.get('/my-results', authenticateToken, resultController.getUserResults);
 router.get('/assessment/:assessment_id', authenticateToken, resultController.getAssessmentResults);
-router.get('/:id', authenticateToken, resultController.getResultDetails);
+//router.get('/:id', authenticateToken, resultController.getResultDetails);
 router.get('/leaderboard/:assessment_id', authenticateToken, resultController.getLeaderboard);
-router.delete('/:id', authenticateToken, resultController.deleteResult
-
-);
+router.delete('/:id', authenticateToken, resultController.deleteResult);
+// Get specific result by ID
+router.get('/:id', authenticateToken, resultController.getResult);
 
 module.exports = router;
 

@@ -37,6 +37,7 @@ const resultsPage = {
 
     renderModernResults() {
         const filteredResults = this.filterResults();
+        const { successRate } = this.calculateSuccessRate();
         const html = `
             <div class="modern-results-container">
                 <!-- Modern Header -->
@@ -70,7 +71,7 @@ const resultsPage = {
                                     <i class="fas fa-chart-line"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <span class="stat-value">${this.calculateSuccessRate()}%</span>
+                                    <span class="stat-value">${successRate}%</span>
                                     <span class="stat-label">Success Rate</span>
                                 </div>
                             </div>
@@ -187,21 +188,77 @@ const resultsPage = {
         `;
     },
 
-    // Add these methods to your resultsPage object
+    // calculateSuccessRate() {
+    // if (this.results.length === 0) return { successRate: 0, uniqueTotal: 0, passedCount: 0 };
+
+    // // Track unique assessments → only count once
+    // const assessmentMap = new Map();
+    //     this.results.forEach(result => {
+    //         const percentage = Math.round((result.score / result.total_questions) * 100);
+    //         const passed = percentage >= 60;
+
+    //         // Save best outcome (if passed once, it stays passed)
+    //         if (!assessmentMap.has(result.assessment_id)) {
+    //             assessmentMap.set(result.assessment_id, passed);
+    //         } else if (passed) {
+    //             assessmentMap.set(result.assessment_id, true);
+    //         }
+    //     });
+
+    //     const uniqueTotal = assessmentMap.size;
+    //     const passedCount = Array.from(assessmentMap.values()).filter(passed => passed).length;
+    //     const successRate = uniqueTotal > 0 ? Math.round((passedCount / uniqueTotal) * 100) : 0;
+
+    //     return { successRate, uniqueTotal, passedCount };
+    // },
+
+
     calculateSuccessRate() {
-        if (this.results.length === 0) return 0;
-        const passedCount = this.results.filter(result => {
+        if (this.results.length === 0) {
+            return { successRate: 0, uniqueTotal: 0, uniquePassed: 0, totalPasses: 0, totalAttempts: 0 };
+        }
+
+        // Track unique assessments
+        const assessmentMap = new Map(); // assessment_id → { attempts, passes }
+        this.results.forEach(result => {
             const percentage = Math.round((result.score / result.total_questions) * 100);
-            return percentage >= 60;
-        }).length;
-        return Math.round((passedCount / this.results.length) * 100);
+            const passed = percentage >= 60;
+
+            if (!assessmentMap.has(result.assessment_id)) {
+                assessmentMap.set(result.assessment_id, { attempts: 0, passes: 0 });
+            }
+
+            const stats = assessmentMap.get(result.assessment_id);
+            stats.attempts += 1;
+            if (passed) stats.passes += 1;
+            assessmentMap.set(result.assessment_id, stats);
+        });
+
+        const uniqueTotal = assessmentMap.size;
+        const uniquePassed = Array.from(assessmentMap.values()).filter(stat => stat.passes > 0).length;
+
+        const totalAttempts = Array.from(assessmentMap.values()).reduce((sum, stat) => sum + stat.attempts, 0);
+        const totalPasses = Array.from(assessmentMap.values()).reduce((sum, stat) => sum + stat.passes, 0);
+
+        // Coverage: how many unique assessments passed
+        const coverage = uniqueTotal > 0 ? uniquePassed / uniqueTotal : 0;
+
+        // Consistency: passes vs attempts
+        const consistency = totalAttempts > 0 ? totalPasses / totalAttempts : 0;
+
+        // Final Success Rate
+        const successRate = Math.round(coverage * 100 * consistency);
+
+        return { successRate, uniqueTotal, uniquePassed, totalPasses, totalAttempts };
     },
 
+
     getPerformanceLevel() {
-        const successRate = this.calculateSuccessRate();
-        if (successRate >= 80) return 'Expert Level';
-        if (successRate >= 60) return 'Advanced';
-        if (successRate >= 40) return 'Intermediate';
+        const { successRate, uniqueTotal } = this.calculateSuccessRate();
+
+        if (uniqueTotal >= 15 && successRate >= 80) return 'Expert Level';
+        if (uniqueTotal >= 10 && successRate >= 60) return 'Advanced';
+        if (uniqueTotal >= 5 && successRate >= 40) return 'Intermediate';
         return 'Beginner';
     },
 

@@ -2,6 +2,8 @@ const Assessment = require('../models/Assessment');
 const Question = require('../models/Question');
 const Payment = require('../models/Payment');
 const { query } = require('../config/database');
+const UserAssessment = require('../models/UserAssessment');
+const Result = require('../models/Result');
 
 const assessmentController = {
   async createAssessment(req, res) {
@@ -69,72 +71,204 @@ const assessmentController = {
     }
   },
 
+  // async startAssessment(req, res) {
+  //   try {
+  //     const { id } = req.params; // assessmentId
+  //     const userId = req.user.id;
+
+  //     // 1. Fetch assessment details
+  //     const assessment = await Assessment.findById(id);
+  //     if (!assessment) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         error: 'Assessment not found'
+  //       });
+  //     }
+
+  //     // 2. Premium assessments → check payment + attempts
+  //     if (assessment.is_premium) {
+  //       const hasAccess = await Payment.verifyUserAccess(userId, id);
+  //       if (!hasAccess) {
+  //         return res.status(403).json({
+  //           success: false,
+  //           error: 'Payment required to access this assessment'
+  //         });
+  //       }
+
+  //       // Find latest user_assessment record
+  //       const result = await query(
+  //         `SELECT * FROM user_assessments
+  //         WHERE user_id=$1 AND assessment_id=$2 AND has_access=true
+  //         ORDER BY purchased_at DESC LIMIT 1`,
+  //         [userId, id]
+  //       );
+
+  //       if (result.rows.length === 0) {
+  //         return res.status(403).json({
+  //           success: false,
+  //           error: 'You must purchase this assessment first.'
+  //         });
+  //       }
+
+  //       const userAssessment = result.rows[0];
+  //       const maxAttempts = 3; // fixed cap
+  //       const attemptsUsed = userAssessment.attempts_used || 0;
+
+  //       if (attemptsUsed >= maxAttempts) {
+  //         return res.status(403).json({
+  //           success: false,
+  //           error: `Max attempts (${maxAttempts}) reached. Please repurchase this assessment.`
+  //         });
+  //       }
+
+  //       // Increment attempts_used immediately
+  //       await query(
+  //         `UPDATE user_assessments
+  //         SET attempts_used = attempts_used + 1
+  //         WHERE id=$1`,
+  //         [userAssessment.id]
+  //       );
+  //     }
+
+  //     // 3. Get randomized questions based on difficulty distribution
+  //     const questions = await Assessment.getQuestionsWithDifficulty(
+  //       id,
+  //       assessment.num_questions
+  //     );
+
+  //     if (questions.length === 0) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         error: 'No questions available for this assessment'
+  //       });
+  //     }
+
+  //     // 4. Format question options (ensure JSON is parsed)
+  //     const formattedQuestions = questions.map(q => ({
+  //       ...q,
+  //       options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+  //     }));
+
+  //     // 5. Success response
+  //     res.json({
+  //       success: true,
+  //       data: {
+  //         assessment: {
+  //           ...assessment,
+  //           time_limit: assessment.time_limit
+  //         },
+  //         questions: formattedQuestions,
+  //         time_limit: assessment.time_limit * 60 // convert minutes → seconds
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error('Error starting assessment:', error);
+  //     res.status(500).json({
+  //       success: false,
+  //       error: 'Failed to start assessment'
+  //     });
+  //   }
+  // },
+
   async startAssessment(req, res) {
-        try {
-            const { id } = req.params;
-            const userId = req.user.id;
+    try {
+      const { id } = req.params; // assessmentId
+      const userId = req.user.id;
 
-            // Get assessment details
-            const assessment = await Assessment.findById(id);
-            if (!assessment) {
-                return res.status(404).json({
-                    success: false,
-                    error: 'Assessment not found'
-                });
-            }
+      // 1. Fetch assessment details
+      const assessment = await Assessment.findById(id);
+      if (!assessment) {
+        return res.status(404).json({
+          success: false,
+          error: 'Assessment not found'
+        });
+      }
 
-            // Check access for premium assessments
-            if (assessment.is_premium) {
-                const hasAccess = await Payment.verifyUserAccess(userId, id);
-                if (!hasAccess) {
-                    return res.status(403).json({
-                        success: false,
-                        error: 'Payment required to access this assessment'
-                    });
-                }
-            }
-
-            // Get randomized questions based on difficulty distribution
-            const questions = await Assessment.getQuestionsWithDifficulty(
-                id, 
-                assessment.num_questions
-            );
-
-            if (questions.length === 0) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'No questions available for this assessment'
-                });
-            }
-
-            // Parse options from JSON string if needed
-            const formattedQuestions = questions.map(question => ({
-                ...question,
-                options: typeof question.options === 'string' 
-                    ? JSON.parse(question.options) 
-                    : question.options
-            }));
-
-            res.json({
-                success: true,
-                data: {
-                    assessment: {
-                        ...assessment,
-                        time_limit: assessment.time_limit
-                    },
-                    questions: formattedQuestions,
-                    time_limit: assessment.time_limit * 60 // Convert to seconds
-                }
-            });
-
-        } catch (error) {
-            console.error('Error starting assessment:', error);
-            res.status(500).json({
-                success: false,
-                error: 'Failed to start assessment'
-            });
+      // 2. Premium assessments → check payment + attempts
+      if (assessment.is_premium) {
+        const hasAccess = await Payment.verifyUserAccess(userId, id);
+        if (!hasAccess) {
+          return res.status(403).json({
+            success: false,
+            error: 'Payment required to access this assessment'
+          });
         }
-    },
+
+        // Find latest user_assessment record
+        const result = await query(
+          `SELECT * FROM user_assessments
+          WHERE user_id=$1 AND assessment_id=$2 AND has_access=true
+          ORDER BY purchased_at DESC LIMIT 1`,
+          [userId, id]
+        );
+
+        if (result.rows.length === 0) {
+          return res.status(403).json({
+            success: false,
+            error: 'You must purchase this assessment first.'
+          });
+        }
+
+        const userAssessment = result.rows[0];
+        const maxAttempts = 3; // fixed cap
+        const attemptsUsed = userAssessment.attempts_used || 0;
+
+        if (attemptsUsed >= maxAttempts) {
+          return res.status(403).json({
+            success: false,
+            error: `Max attempts (${maxAttempts}) reached. Please repurchase this assessment.`
+          });
+        }
+
+        // ✅ Increment attempts_used immediately
+        await query(
+          `UPDATE user_assessments
+          SET attempts_used = attempts_used + 1
+          WHERE id=$1`,
+          [userAssessment.id]
+        );
+      }
+
+      // 3. Get randomized questions based on difficulty distribution
+      const questions = await Assessment.getQuestionsWithDifficulty(
+        id,
+        assessment.num_questions
+      );
+
+      if (questions.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'No questions available for this assessment'
+        });
+      }
+
+      // 4. Format question options (ensure JSON is parsed)
+      const formattedQuestions = questions.map(q => ({
+        ...q,
+        options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+      }));
+
+      // 5. Success response
+      res.json({
+        success: true,
+        data: {
+          assessment: {
+            ...assessment,
+            time_limit: assessment.time_limit
+          },
+          questions: formattedQuestions,
+          time_limit: assessment.time_limit * 60 // convert minutes → seconds
+        }
+      });
+    } catch (error) {
+      console.error('Error starting assessment:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to start assessment'
+      });
+    }
+  },
+
 
   async getAssessment(req, res) {
     try {
@@ -267,7 +401,61 @@ const assessmentController = {
         error: 'Failed to fetch user assessments'
       });
     }
+  },
+
+  async getAssessmentInstructions(req, res) {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+
+      // 1. Fetch assessment
+      const assessment = await Assessment.findById(id);
+      if (!assessment) {
+        return res.status(404).json({
+          success: false,
+          error: 'Assessment not found',
+        });
+      }
+
+      let hasAccess = !assessment.is_premium; // Free assessments always accessible
+      let attemptsUsed = 0;
+      let maxAttempts = assessment.is_premium ? 3 : null;
+      let attemptsLeft = maxAttempts; // default = all left
+
+      if (assessment.is_premium) {
+        // 2. Check if user has purchased access
+        const purchase = await UserAssessment.findByUserAndAssessment(userId, id);
+        if (purchase && purchase.has_access) {
+          hasAccess = true;
+
+          // 3. Get attempts used directly from user_assessments
+          attemptsUsed = purchase.attempts_used || 0;
+          attemptsLeft = maxAttempts - attemptsUsed;
+
+          // Prevent negative numbers if something goes wrong
+          if (attemptsLeft < 0) attemptsLeft = 0;
+        }
+      }
+
+      res.json({
+        success: true,
+        data: {
+          ...assessment,
+          hasAccess,
+          attemptsUsed,
+          maxAttempts,
+          attemptsLeft
+        },
+      });
+    } catch (err) {
+      console.error('Error fetching assessment instructions:', err);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch assessment instructions',
+      });
+    }
   }
+
 };
 
 module.exports = assessmentController;

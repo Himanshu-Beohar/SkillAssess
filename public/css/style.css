@@ -1050,7 +1050,7 @@ footer {
 }
 
 .stat-label {
-    color: var(--gray);
+    color: var(#020305);
     font-size: 0.9rem;
 }
 
@@ -1631,6 +1631,7 @@ footer {
 
 .stat-item:hover {
     background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
 }
 
@@ -1745,21 +1746,7 @@ footer {
     gap: 1.5rem;
 }
 
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
 
-.stat-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
 
 .stat-icon {
     width: 50px;
@@ -3181,4 +3168,284 @@ footer {
   font-size: 0.9rem;
   font-weight: 400;
   opacity: 0.9;
+}
+
+/* assessment instructions page */
+.instructions-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+.instructions-card {
+  width: 100%;
+  max-width: 980px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.8rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+}
+.instructions-left h2 {
+  margin-bottom: 0.8rem;
+}
+.instructions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+.instructions-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed #eee;
+  color: #333;
+}
+.instructions-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.instructions-notes {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background: #f9fbff;
+  border-radius: 8px;
+  color: #444;
+  font-size: 0.95rem;
+}
+@media (max-width: 900px) {
+  .instructions-card { grid-template-columns: 1fr; }
+  .instructions-actions { order: 2; }
+}
+
+/* Progress bar styles */
+.progress-bar-container {
+  margin-top: 10px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4cafef, #2196f3);
+  transition: width 0.5s ease-in-out;
+}
+
+.progress-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #444;
+}
+
+/* Wins Page Modern Styling */
+.wins-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.wins-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.wins-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.wins-header p {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+/* Badge */
+.badge-display {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center;     /* Centers vertically (if height > content) */
+  align-items: center;
+  gap: 1.4rem;
+  background: #6a11cb;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  margin: 1rem auto;       /* Ensures it stays centered if inside a wider container */
+  color: #ddd;
+
+}
+
+.badge-display i {
+  color: #fbbf24;
+  font-size: 1.5rem;
+  
+}
+
+/* Progress / Next Goal */
+.next-goal-card {
+  margin: 2rem 0;
+  padding: 1.2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.next-goal-card h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+
+/* Analytics Cards */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.2rem;
+  margin: 2rem 0;
+}
+
+.analytics-card {
+  background: #f3f4f6;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+.analytics-card:hover {
+  transform: translateY(-4px);
+}
+.analytics-card i {
+  font-size: 1.5rem;
+  color: #6a11cb;
+  margin-bottom: 0.5rem;
+}
+.analytics-card .value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+}
+.analytics-card .label {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* Info sections */
+.info-section {
+  margin: 2rem 0;
+}
+.info-section h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: #374151;
+}
+.info-section p, .info-section li {
+  color: #4b5563;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.info-section ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+/* Wins Tab Highlight */
+.wins-highlight {
+  color: #fff !important;
+  background: #dc2626; /* Red background */
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  font-weight: 600;
+  position: relative;
+  animation: pulseHighlight 1.5s infinite ease-in-out;
+  transition: transform 0.3s ease;
+}
+
+/* Glow Effect */
+.wins-highlight::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 12px;
+  border: 2px solid rgba(220, 38, 38, 0.6);
+  animation: glowPulse 1.5s infinite ease-in-out;
+}
+
+/* Pulsating background + scaling */
+@keyframes pulseHighlight {
+  0%   { transform: scale(1); background: #dc2626; }
+  50%  { transform: scale(1.1); background: #b91c1c; }
+  100% { transform: scale(1); background: #dc2626; }
+}
+
+/* Outer glowing border */
+@keyframes glowPulse {
+  0%   { opacity: 0.6; transform: scale(1); }
+  50%  { opacity: 0.2; transform: scale(1.2); }
+  100% { opacity: 0.6; transform: scale(1); }
+}
+
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.98); /* Increased opacity for clarity */
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    gap: 0.8rem;
+    color: #1f2937; /* Ensure text color stays strong */
+    font-weight: 600;
+}
+
+.stat-item * {
+    position: relative;
+    z-index: 1; /* Keep text/icons above any background layers */
+}
+
+.badge-logo {
+  height: 50px;    /* pick any value between 40px–60px */
+  width: auto;     /* keeps aspect ratio */
+  display: inline-block;
+  vertical-align: middle; /* aligns nicely with text/menu */
 }

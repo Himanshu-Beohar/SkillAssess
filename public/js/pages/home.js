@@ -161,9 +161,6 @@ const homePage = {
                                             ${assessment.is_premium ? 'Premium' : 'Free'}
                                         </span>
                                     </div>
-                                    <button class="btn btn-primary btn-full" onclick="router.navigateTo('/assessment/${assessment.id}')">
-                                        ${assessment.is_premium ? 'View Details' : 'Start Now'}
-                                    </button>
                                 </div>
                             </div>
                         `).join('')}

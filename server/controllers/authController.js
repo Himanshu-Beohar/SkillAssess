@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { query } = require('../config/database');
+const bcrypt = require('bcryptjs');
 
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
@@ -137,14 +138,57 @@ const authController = {
     }
   },
 
+  // async changePassword(req, res) {
+  //   try {
+  //     const { currentPassword, newPassword } = req.body;
+  //     const userId = req.user.id;
+
+  //     const user = await User.findByEmail(req.user.email);
+  //     const isCurrentPasswordValid = await User.comparePassword(currentPassword, user.password);
+
+  //     if (!isCurrentPasswordValid) {
+  //       return res.status(401).json({
+  //         success: false,
+  //         error: 'Current password is incorrect'
+  //       });
+  //     }
+
+  //     const saltRounds = 10;
+  //     const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+  //     await query(
+  //       'UPDATE users SET password = $1 WHERE id = $2',
+  //       [hashedNewPassword, userId]
+  //     );
+
+  //     res.json({
+  //       success: true,
+  //       message: 'Password changed successfully'
+  //     });
+  //   } catch (error) {
+  //     res.status(500).json({
+  //       success: false,
+  //       error: 'Failed to change password'
+  //     });
+  //   }
+  // }
+
   async changePassword(req, res) {
     try {
       const { currentPassword, newPassword } = req.body;
       const userId = req.user.id;
 
-      const user = await User.findByEmail(req.user.email);
-      const isCurrentPasswordValid = await User.comparePassword(currentPassword, user.password);
+      // 1. Fetch user by ID (safer than email from token)
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: 'User not found'
+        });
+      }
 
+      // 2. Compare current password
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
       if (!isCurrentPasswordValid) {
         return res.status(401).json({
           success: false,
@@ -152,11 +196,13 @@ const authController = {
         });
       }
 
+      // 3. Hash new password
       const saltRounds = 10;
       const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
 
+      // 4. Update password in DB
       await query(
-        'UPDATE users SET password = $1 WHERE id = $2',
+        'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2',
         [hashedNewPassword, userId]
       );
 
@@ -165,12 +211,14 @@ const authController = {
         message: 'Password changed successfully'
       });
     } catch (error) {
+      console.error('Error changing password:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to change password'
       });
     }
   }
+
 };
 
 module.exports = authController;

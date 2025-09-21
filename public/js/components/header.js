@@ -8,7 +8,7 @@ const headerComponent = {
         const headerHTML = `
             <div class="header-content">
                 <div class="logo">
-                    <i class="fas fa-brain"></i>
+                    <img src="/assets/images/skillassess_logo.png" alt="SkillAssess Logo" class="badge-logo">
                     <span>SkillAssess</span>
                 </div>
                 <nav>
@@ -21,6 +21,7 @@ const headerComponent = {
                             <li>
                                 <div class="user-menu">
                                     <span class="user-greeting">Hello, ${user.name}</span>
+                                    <li><a href="/wins" class="nav-link wins-highlight">Wins</a></li>
                                     <button class="btn btn-outline btn-sm logout-button">Logout</button>
                                 </div>
                             </li>

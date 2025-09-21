@@ -16,7 +16,8 @@ const config = {
         REGISTER: '/register',
         ASSESSMENTS: '/assessments',
         PROFILE: '/profile',
-        RESULTS: '/results'
+        RESULTS: '/results',
+        INSTRUCTIONS: '/assessment/:id/instructions',
     },
     
     STORAGE_KEYS: {

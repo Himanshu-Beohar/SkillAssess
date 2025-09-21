@@ -311,7 +311,7 @@ const paymentPage = {
                 
                 setTimeout(() => {
                     utils.showNotification('🎉 Premium access granted! Redirecting...', 'success');
-                    router.navigateTo(`/assessment/${this.currentAssessment.id}`);
+                    router.navigateTo(`/assessment/${this.currentAssessment.id}/instructions`);
                 }, 2500);
                 
             } else {

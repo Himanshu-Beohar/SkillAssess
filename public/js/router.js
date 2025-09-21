@@ -13,11 +13,15 @@ const router = {
             [config.ROUTES.ASSESSMENTS]: assessmentsPage,
             [config.ROUTES.PROFILE]: profilePage,
             [config.ROUTES.RESULTS]: resultsPage,
+            '/wins': winsPage,   // ✅ make sure this matches
+            '/assessment/:id/instructions': assessmentInstructionsPage,
             '/assessment/:id': assessmentPage,
             '/payment/:id': paymentPage,
             //[config.ROUTES.RESULTS]: resultsPage, // All results history
             '/result/:id': singleResultPage,      // Single result view
-            '/assessment-result': assessmentResultPage // New assessment result
+            '/assessment-result': assessmentResultPage, // New assessment result
+            '/wins': winsPage
+            
         };
 
         // Handle browser back/forward

@@ -12,26 +12,28 @@ const footerComponent = {
                 <div class="footer-section">
                     <h3>Quick Links</h3>
                     <ul>
-                        <li><a href="${config.ROUTES.HOME}">Home</a></li>
+                        <li><a href="${config.ROUTES.HOME}">Skillassess Home</a></li>
                         <li><a href="${config.ROUTES.ASSESSMENTS}">Assessments</a></li>
-                        <li><a href="#">Pricing</a></li>
-                        <li><a href="#">Contact</a></li>
+                        <li><a href="https://gyanovation.com/">Gyanovation Home</a></li>
+                        <li><a href="https://gyanovation.com/contact-us/">Contact Us</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-section">
                     <h3>Connect</h3>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="https://www.facebook.com/share/19dRiSDgdQ/"><i class="fab fa-facebook"></i></a>
+                        <a href="https://x.com/GyanovationTech?t=QcLfNLWF6eYgwKP5OC92BA&s=09"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.linkedin.com/company/gyanovationtechnologies"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.instagram.com/gyanovationtech?igsh=MWdmdTcyeXQwcWZzbA=="><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2023 SkillAssess. All rights reserved. | Ready for Railway Deployment</p>
+                <p>&copy; 2025 SkillAssess. All rights reserved. | Powered by Gyanovation Technologies</p>
+                <p>📞 +91-8085554178 | 📧 contact@gyanovation.com</p>
+
             </div>
         `;
         

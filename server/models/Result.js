@@ -84,6 +84,16 @@ class Result {
         throw error;
     }
   }
+
+  static async countByUserAndAssessment(userId, assessmentId) {
+    const result = await query(
+      `SELECT COUNT(*) 
+      FROM results 
+      WHERE user_id = $1 AND assessment_id = $2`,
+      [userId, assessmentId]
+    );
+    return parseInt(result.rows[0].count, 10);
+  }
 }
 
 module.exports = Result;

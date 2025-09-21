@@ -15,5 +15,9 @@ router.delete('/:id', authenticateToken, assessmentController.deleteAssessment);
 router.post('/:assessment_id/questions', authenticateToken, assessmentController.addQuestion);
 router.get('/user/my-assessments', authenticateToken, assessmentController.getUserAssessments);
 router.get('/:id/start', authenticateToken, assessmentController.startAssessment);
+// Get instructions for a specific assessment (protected)
+//router.get('/:id/instructions', authenticateToken, assessmentController.getInstructions);
+router.get('/:id/instructions', authenticateToken, assessmentController.getAssessmentInstructions);
+
 
 module.exports = router;

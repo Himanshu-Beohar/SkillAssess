@@ -35,3 +35,6 @@ INSERT INTO questions (assessment_id, question_text, options, correct_answer) VA
 (2, 'Which SQL keyword is used to sort the result-set?', 
  '["SORT", "ORDER BY", "ARRANGE", "SORT BY"]', 1)
 ON CONFLICT DO NOTHING;
+
+ALTER TABLE questions 
+  ADD COLUMN d_level INT CHECK (d_level IN (1,2,3));

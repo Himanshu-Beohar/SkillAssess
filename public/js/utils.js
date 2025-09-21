@@ -56,6 +56,16 @@ const utils = {
         return notification;
     },
 
+    escapeHtml(string) {
+        if (typeof string !== "string") return string;
+        return string
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    },
+
     // Show loading overlay
     showLoading(message = 'Loading...') {
         const overlay = document.getElementById('loading-overlay');

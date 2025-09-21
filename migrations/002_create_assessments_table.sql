@@ -20,3 +20,7 @@ INSERT INTO assessments (title, description, price, is_premium, created_by) VALU
 ('UI/UX Design Principles', 'Evaluate your understanding of modern UI/UX design practices', 0, false, 1),
 ('Cloud Architecture', 'Advanced assessment on cloud infrastructure and best practices', 799, true, 1)
 ON CONFLICT DO NOTHING;
+
+ALTER TABLE assessments 
+  ADD COLUMN num_questions INT DEFAULT 0,
+  ADD COLUMN time_limit INT DEFAULT 0;

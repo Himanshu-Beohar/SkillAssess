@@ -51,6 +51,7 @@ const loginPage = {
         try {
             await auth.login(email, password);
             router.navigateTo(config.ROUTES.HOME);
+            //router.navigateTo('/wins');
         } catch (error) {
             console.error('Login failed:', error);
         }

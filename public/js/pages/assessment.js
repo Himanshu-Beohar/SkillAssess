@@ -300,8 +300,7 @@ const assessmentPage = {
                     //stopLockdown();
                     Lockdown.stop();
                 }
-                this.resetState(); // clear answers so next attempt starts fresh
-                router.navigateTo(config.ROUTES.RESULTS);
+                this.resetState();
                 utils.showNotification('Assessment submitted successfully!', 'success');
                 
                 // Navigate to modern results page

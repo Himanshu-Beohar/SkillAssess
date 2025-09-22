@@ -3449,3 +3449,40 @@ footer {
   display: inline-block;
   vertical-align: middle; /* aligns nicely with text/menu */
 }
+
+.instructions-violations {
+  width: 100%;
+  background: #fff4f4;
+  border: 2px solid #f5c2c2;
+  border-left: 8px solid #e63946;
+  padding: 2rem;
+  margin: 2rem 0;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+
+.instructions-violations h3 {
+  margin-bottom: 1.2rem;
+  font-size: 1.4rem;              /* bigger heading */
+  font-weight: 700;
+  color: #e63946;
+}
+
+.instructions-violations ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.instructions-violations li {
+  margin-bottom: 0.8rem;          /* bigger spacing between points */
+  line-height: 1.6;
+}
+
+.violation-note {
+  margin-top: 1.5rem;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: #555;
+}

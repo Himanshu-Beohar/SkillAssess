@@ -266,6 +266,12 @@ const assessmentPage = {
         }
     },
 
+    resetState() {
+        this.userAnswers = [];
+        this.currentQuestionIndex = 0;
+        this.questions = [];
+        },
+
     async submitAssessment() {
         // Check if all questions are answered
         const unansweredQuestions = this.userAnswers.filter(answer => answer === undefined);
@@ -289,6 +295,13 @@ const assessmentPage = {
 
             if (response.success) {
                 this.stopTimer();
+                // ✅ Exit lockdown mode before navigating away
+                if (typeof Lockdown !== "undefined") {
+                    //stopLockdown();
+                    Lockdown.stop();
+                }
+                this.resetState(); // clear answers so next attempt starts fresh
+                router.navigateTo(config.ROUTES.RESULTS);
                 utils.showNotification('Assessment submitted successfully!', 'success');
                 
                 // Navigate to modern results page

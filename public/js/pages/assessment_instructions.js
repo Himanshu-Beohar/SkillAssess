@@ -421,10 +421,10 @@ const assessmentInstructionsPage = {
                 }
               </ul>
 
-              <div class="instructions-notes">
-                <p><strong>Important:</strong> Once you click <em>Start Assessment</em> the timer will begin immediately. Do not refresh or close the tab during the test.</p>
-              </div>
+              
+              
             </div>
+            
 
             <div class="instructions-actions">
               ${isPremium ? (() => {
@@ -453,9 +453,29 @@ const assessmentInstructionsPage = {
               <button class="btn btn-outline btn-block" id="instruction-back-btn">
                 Back to Assessments
               </button>
+            <div class="instructions-notes">
+                <p><strong>Important:</strong> Once you click <em>Start Assessment</em> the timer will begin immediately. Do not refresh or close the tab during the test.</p>
             </div>
+            </div>
+            
           </div>
+
         </div>
+                  <div class="instructions-violations">
+            <h3>⚠️ Important – Anti-Cheating Rules</h3>
+            <ul>
+              <li>🔒 This assessment will run in <strong>Full-Screen Mode</strong>. 
+                  If you exit full-screen, your attempt may be <strong>terminated</strong>.</li>
+              <li>📋 <strong>Copy, paste, right-click, and print-screen</strong> are disabled during the test.</li>
+              <li>🚫 <strong>Switching tabs, applications, or minimizing</strong> the browser will be treated as a violation.</li>
+              <li>⏱️ Each violation will be logged. Multiple violations can lead to <strong>cancellation of your attempt</strong>.</li>
+              <li>✅ Stay focused and complete the test in the given time without refreshing or closing the window.</li>
+            </ul>
+            <p class="violation-note">
+              By clicking <strong>Start Assessment</strong>, you agree to follow these rules. 
+              Violations may result in loss of attempts and require you to repurchase the assessment.
+            </p>
+          </div>
       </div>
     `;
 
@@ -493,11 +513,48 @@ const assessmentInstructionsPage = {
           });
       }
     } else {
+      // const startBtn = document.getElementById("instruction-start-btn");
+      // if (startBtn)
+      //   // startBtn.addEventListener("click", () => {
+      //   //   router.navigateTo(`/assessment/${a.id}`);
+      //   // });
+      //   // inside assessmentInstructionsPage.render() start button listener:
+      //   startBtn.addEventListener('click', async () => {
+      //     try {
+      //       // start server-side session if needed, then start lockdown
+      //       await startLockdown(a.id, { maxViolations: 3, autoSubmitOnViolations: true });
+      //       // after Lockdown.start returns, navigate to actual assessment runner page if different
+      //       router.navigateTo(`/assessment/${a.id}`);
+      //     } catch (err) {
+      //       utils.showNotification('Could not start secure assessment. Please allow fullscreen.', 'error');
+      //     }
+      //   });
+
       const startBtn = document.getElementById("instruction-start-btn");
-      if (startBtn)
-        startBtn.addEventListener("click", () => {
-          router.navigateTo(`/assessment/${a.id}`);
+      if (startBtn) {
+        startBtn.addEventListener("click", async () => {
+          try {
+            // 🚨 Tell backend to create a new attempt
+            //await api.post(`/assessments/${a.id}/start`, { newAttempt: true });
+            await api.get(`/assessments/${a.id}/start?newAttempt=true`);
+
+            // 🚨 Reset client-side state before loading assessment
+            if (typeof assessmentPage !== "undefined" && assessmentPage.resetState) {
+              assessmentPage.resetState();
+            }
+
+            // Start lockdown (fullscreen etc.)
+            await startLockdown(a.id, { maxViolations: 3, autoSubmitOnViolations: true });
+
+            // Navigate to assessment runner
+            router.navigateTo(`/assessment/${a.id}`);
+          } catch (err) {
+            console.error("Error starting assessment:", err);
+            utils.showNotification("Could not start assessment. Please try again.", "error");
+          }
         });
+      }
+
     }
   },
 };

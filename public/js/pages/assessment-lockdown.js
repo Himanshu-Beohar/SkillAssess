@@ -41,7 +41,7 @@ const Lockdown = {
 
     // Inform server that assessment started (optional)
     fetch(`/api/assessments/${this.assessmentId}/start`, {
-      method: 'POST',
+      method: 'GET',
       headers: this._headers(),
       body: JSON.stringify({ started_at: new Date().toISOString() })
     }).catch(() => {});

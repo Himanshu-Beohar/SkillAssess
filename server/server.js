@@ -40,11 +40,32 @@ app.use(
 );
 
 // Rate limiting
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+// });
+// app.use(limiter);
+
+//-------------------------------------------------------------
+
+// More lenient rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: process.env.NODE_ENV === "production" ? 1000 : 5000, // higher for prod & very high for dev
+  standardHeaders: true,    // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false,     // Disable the `X-RateLimit-*` headers
+  handler: (req, res, next) => {
+    console.warn(
+      `⚠️ Rate limit exceeded: IP=${req.ip}, URL=${req.originalUrl}`
+    );
+    res.status(429).json({
+      error: "Too many requests. Please slow down.",
+    });
+  },
 });
+
 app.use(limiter);
+//-------------------------------------------------------------------------------
 
 // CORS
 app.use(

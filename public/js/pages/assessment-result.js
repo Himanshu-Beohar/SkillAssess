@@ -159,6 +159,6 @@ const assessmentResultPage = {
     },
 
     downloadCertificate() {
-        utils.showNotification('Certificate download will be available soon!', 'info');
+        utils.showNotification('Certificate download will be available soon!\nYou will receive your certificate through email shortly.', 'info');
     }
 };

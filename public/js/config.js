@@ -12,6 +12,8 @@ const config = {
     
     ROUTES: {
         HOME: '/',
+        FORGOT_PASSWORD: '/forgot-password',
+        RESET_PASSWORD: '/reset-password/:token',
         LOGIN: '/login',
         REGISTER: '/register',
         ASSESSMENTS: '/assessments',

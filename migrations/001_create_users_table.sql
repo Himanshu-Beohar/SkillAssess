@@ -15,3 +15,7 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 INSERT INTO users (email, password, name) 
 VALUES ('admin@skillassess.com', '$2a$10$rOzZzJ9ZcG39W2h6VqVZMeO6Vz9q9Q1Xq9Q1Xq9Q1Xq9Q1Xq9Q1Xq9', 'Admin User')
 ON CONFLICT (email) DO NOTHING;
+
+ALTER TABLE users 
+ADD COLUMN reset_token TEXT,
+ADD COLUMN reset_token_expiry TIMESTAMP;

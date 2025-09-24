@@ -2,30 +2,39 @@
 const winsPage = {
   results: [],
 
+  // In winsPage.js - UPDATE the load method to debug API response
   async load() {
-    try {
-      utils.showLoading('Loading your achievements...');
-      const response = await api.get('/results/my-results');
+      try {
+          utils.showLoading('Loading your achievements...');
+          const response = await api.get('/results/my-results');
 
-      if (response.success) {
-        this.results = response.data.results || [];
-        this.render();
-      } else {
-        this.renderEmpty();
+          console.log('Wins API Response:', response); // Debug log
+
+          if (response.success) {
+              this.results = response.data.results || [];
+              console.log('Results data loaded:', this.results); // Debug log
+              this.render();
+          } else {
+              console.warn('Wins API returned unsuccessful:', response);
+              this.renderEmpty();
+          }
+      } catch (err) {
+          console.error('Error loading Wins page:', err);
+          utils.showNotification('Failed to load achievements', 'error');
+          this.renderError();
+      } finally {
+          utils.hideLoading();
       }
-    } catch (err) {
-      console.error('Error loading Wins page:', err);
-      utils.showNotification('Failed to load achievements', 'error');
-      this.renderError();
-    } finally {
-      utils.hideLoading();
-    }
   },
 
-  render() {
-    const { successRate, uniqueTotal, uniquePassed } = this.calculateSuccessRate();
+  // In winsPage.js - UPDATE the render method to use actual data
+render() {
+    const { successRate, uniqueTotal, uniquePassed, totalAttempts, totalPasses } = this.calculateSuccessRate();
     const level = this.getPerformanceLevel();
     const { nextGoal, progressPercent, progressLabel } = this.getNextGoal(uniquePassed, successRate);
+
+    // Determine badge icon based on level
+    const badgeIcon = this.getBadgeIcon(level);
 
     const html = `
       <div class="wins-container">
@@ -35,47 +44,48 @@ const winsPage = {
         </div>
 
         <div class="badge-display">
-            <i class="fas fa-star"></i> Beginner
+            <i class="fas ${badgeIcon}"></i> ${level}
         </div>
 
         <div class="next-goal-card">
             <h2>🚀 Your Next Goal</h2>
-            <p>Pass 3 more unique assessments to reach Intermediate.</p>
+            <p>${nextGoal}</p>
             <div class="progress-bar">
-            <div class="progress-fill" style="width:40%"></div>
+                <div class="progress-fill" style="width:${progressPercent}%"></div>
             </div>
+            <small>${progressLabel} - ${progressPercent}% complete</small>
         </div>
 
         <div class="analytics-grid">
             <div class="analytics-card">
-            <i class="fas fa-clipboard-list"></i>
-            <div class="value">33</div>
-            <div class="label">Total Attempts</div>
+                <i class="fas fa-clipboard-list"></i>
+                <div class="value">${totalAttempts}</div>
+                <div class="label">Total Attempts</div>
             </div>
             <div class="analytics-card">
-            <i class="fas fa-layer-group"></i>
-            <div class="value">2</div>
-            <div class="label">Unique Attempted</div>
+                <i class="fas fa-layer-group"></i>
+                <div class="value">${uniqueTotal}</div>
+                <div class="label">Unique Attempted</div>
             </div>
             <div class="analytics-card">
-            <i class="fas fa-check-circle"></i>
-            <div class="value">2</div>
-            <div class="label">Unique Passed</div>
+                <i class="fas fa-check-circle"></i>
+                <div class="value">${uniquePassed}</div>
+                <div class="label">Unique Passed</div>
             </div>
             <div class="analytics-card">
-            <i class="fas fa-chart-line"></i>
-            <div class="value">21%</div>
-            <div class="label">Success Rate</div>
+                <i class="fas fa-chart-line"></i>
+                <div class="value">${successRate}%</div>
+                <div class="label">Success Rate</div>
             </div>
         </div>
 
         <div class="info-section">
             <h3>🥇 How Badges Work</h3>
             <ul>
-            <li><b>Beginner:</b> Default level for all users</li>
-            <li><b>Intermediate:</b> 5+ unique passes with 40%+ success rate</li>
-            <li><b>Advanced:</b> 10+ unique passes with 60%+ success rate</li>
-            <li><b>Expert:</b> 15+ unique passes with 80%+ success rate</li>
+                <li><b>Beginner:</b> Default level for all users</li>
+                <li><b>Intermediate:</b> 5+ unique passes with 40%+ success rate</li>
+                <li><b>Advanced:</b> 10+ unique passes with 60%+ success rate</li>
+                <li><b>Expert:</b> 15+ unique passes with 80%+ success rate</li>
             </ul>
         </div>
 
@@ -85,11 +95,68 @@ const winsPage = {
             Earn certificates on passing any assessment, recognized by Gyanovation. 
             Showcase your skills and boost your resume!</p>
         </div>
-        </div>
 
+        <!-- Recent Results Table -->
+        ${this.renderRecentResults()}
+      </div>
     `;
 
     document.getElementById('page-content').innerHTML = html;
+},
+
+// ADD this helper method to get badge icons
+getBadgeIcon(level) {
+    switch(level) {
+        case 'Expert Level': return 'fa-crown';
+        case 'Advanced': return 'fa-trophy';
+        case 'Intermediate': return 'fa-award';
+        default: return 'fa-star';
+    }
+},
+
+  // ADD this method to show recent results
+  renderRecentResults() {
+      if (this.results.length === 0) return '';
+
+      const recentResults = this.results.slice(0, 5); // Show last 5 results
+
+      return `
+          <div class="recent-results">
+              <h3>📊 Recent Assessments</h3>
+              <div class="results-table">
+                  <table>
+                      <thead>
+                          <tr>
+                              <th>Assessment</th>
+                              <th>Date</th>
+                              <th>Score</th>
+                              <th>Status</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          ${recentResults.map(result => {
+                              const percentage = Math.round((result.score / result.total_questions) * 100);
+                              const passed = percentage >= 60;
+                              const date = new Date(result.submitted_at).toLocaleDateString();
+                              
+                              return `
+                                  <tr>
+                                      <td>${result.assessment_title || 'Assessment'}</td>
+                                      <td>${date}</td>
+                                      <td>${percentage}%</td>
+                                      <td>
+                                          <span class="status ${passed ? 'passed' : 'failed'}">
+                                              ${passed ? '✅ Passed' : '❌ Failed'}
+                                          </span>
+                                      </td>
+                                  </tr>
+                              `;
+                          }).join('')}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      `;
   },
 
   // Same empty/error methods as before

@@ -83,9 +83,7 @@ const assessmentInstructionsPage = {
                 }
               </ul>
 
-              <div class="instructions-notes">
-                <p><strong>Important:</strong> Once you click <em>Start Assessment</em> the timer will begin immediately. Do not refresh or close the tab during the test.</p>
-              </div>
+              
             </div>
 
             <div class="instructions-actions">
@@ -103,7 +101,7 @@ const assessmentInstructionsPage = {
                   } else {
                     return `
                       <button class="btn btn-primary btn-block" id="instruction-start-btn">
-                        Start Assessment
+                        Start Assessment (${a.attemptsLeft} attempt(s) left)
                       </button>`;
                   }
                 })()
@@ -115,6 +113,9 @@ const assessmentInstructionsPage = {
               <button class="btn btn-outline btn-block" id="instruction-back-btn">
                 Back to Assessments
               </button>
+              <div class="instructions-notes">
+                <p><strong>Important:</strong> Once you click <em>Start Assessment</em> the timer will begin immediately. Do not refresh or close the tab during the test.</p>
+            </div>
             </div>
           </div>
         </div>
@@ -123,7 +124,7 @@ const assessmentInstructionsPage = {
           <h3>⚠️ Important – Anti-Cheating Rules</h3>
           <ul>
             <li>🔒 This assessment will run in <strong>Full-Screen Mode</strong>. If you exit full-screen, your attempt may be <strong>terminated</strong>.</li>
-            <li>📋 <strong>Copy, paste, right-click, and print-screen</strong> are disabled during the test.</li>
+            <li>📋 <strong>Copy, paste, right-click, and print-screen</strong> are disabled during the test. Doing so will be treated as violation.</li>
             <li>🚫 <strong>Switching tabs, applications, or minimizing</strong> the browser will be treated as a violation.</li>
             <li>⏱️ Each violation will be logged. Multiple violations can lead to <strong>cancellation of your attempt</strong>.</li>
             <li>✅ Stay focused and complete the test in the given time without refreshing or closing the window.</li>
@@ -159,33 +160,63 @@ const assessmentInstructionsPage = {
           });
       } else {
         const startBtn = document.getElementById("instruction-start-btn");
-        if (startBtn)
-          startBtn.addEventListener("click", async () => {
-            try {
-              if (typeof assessmentPage !== "undefined" && assessmentPage.resetState) {
-                assessmentPage.resetState();
-              }
-              await startLockdown(a.id, { maxViolations: 3, autoSubmitOnViolations: true });
-              router.navigateTo(`/assessment/${a.id}`);
-            } catch (err) {
-              utils.showNotification("Could not start secure assessment. Please allow fullscreen.", "error");
-            }
-          });
-      }
-    } else {
-      const startBtn = document.getElementById("instruction-start-btn");
-      if (startBtn)
-        startBtn.addEventListener("click", async () => {
-          try {
-            if (typeof assessmentPage !== "undefined" && assessmentPage.resetState) {
-              assessmentPage.resetState();
-            }
-            await startLockdown(a.id, { maxViolations: 3, autoSubmitOnViolations: true });
-            router.navigateTo(`/assessment/${a.id}`);
-          } catch (err) {
-            utils.showNotification("Could not start secure assessment. Please allow fullscreen.", "error");
-          }
-        });
+        if (startBtn) {
+            startBtn.addEventListener("click", async () => {
+                try {
+                    // Reset assessment state
+                    if (typeof assessmentPage !== "undefined" && assessmentPage.resetState) {
+                        assessmentPage.resetState();
+                    }
+                    
+                    // Store assessment ID for the assessment page
+                    sessionStorage.setItem('currentAssessmentId', a.id);
+                    
+                    // 🔹 START LOCKDOWN IMMEDIATELY (while still in user gesture context)
+                    console.log('Starting lockdown before navigation...');
+                    await startLockdown(a.id, { maxViolations: 3, autoSubmitOnViolations: true });
+                    
+                    // 🔹 Navigate after lockdown starts successfully
+                    router.navigateTo(`/assessment/${a.id}`);
+                    
+                } catch (err) {
+                    console.error("Lockdown failed:", err);
+                    utils.showNotification("Could not start secure assessment. Please allow fullscreen.", "error");
+                    
+                    // Stop lockdown if it partially started
+                    if (typeof Lockdown !== "undefined" && Lockdown.stop) {
+                        Lockdown.stop();
+                    }
+                }
+            });
+        }
     }
-  },
+    } else {
+        const startBtn = document.getElementById("instruction-start-btn");
+        if (startBtn) {
+            startBtn.addEventListener("click", async () => {
+                try {
+                    if (typeof assessmentPage !== "undefined" && assessmentPage.resetState) {
+                        assessmentPage.resetState();
+                    }
+                    
+                    // 🔹 START LOCKDOWN IMMEDIATELY (while still in user gesture context)
+                    console.log('Starting lockdown before navigation...');
+                    await startLockdown(a.id, { maxViolations: 3, autoSubmitOnViolations: true });
+                    
+                    // 🔹 Navigate after lockdown starts successfully
+                    router.navigateTo(`/assessment/${a.id}`);
+                    
+                } catch (err) {
+                    console.error("Lockdown failed:", err);
+                    utils.showNotification("Could not start secure assessment. Please allow fullscreen.", "error");
+                    
+                    // Stop lockdown if it partially started
+                    if (typeof Lockdown !== "undefined" && Lockdown.stop) {
+                        Lockdown.stop();
+                    }
+                }
+            });
+        }
+    }
+  }
 };

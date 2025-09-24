@@ -9,19 +9,29 @@ const assessmentPage = {
     timeLimit: 0,
 
     async load(data) {
-        const assessmentId = data?.id || router.getRouteParams().id;
+        console.log('Assessment load called with:', { data, routeParams: router.getRouteParams() });
+        
+        let assessmentId = data?.id || router.getRouteParams().id;
+        console.log('Initial assessmentId:', assessmentId);
         
         if (!assessmentId) {
+            assessmentId = sessionStorage.getItem('currentAssessmentId');
+            console.log('AssessmentId from sessionStorage:', assessmentId);
+        }
+        
+        if (!assessmentId) {
+            console.error('No assessment ID found');
             utils.showNotification('Assessment not found', 'error');
             router.navigateTo(config.ROUTES.ASSESSMENTS);
             return;
         }
 
         try {
+            console.log('Loading assessment:', assessmentId);
             utils.showLoading('Preparing your assessment...');
             
-            // Use the new start endpoint that includes timer and randomized questions
             const response = await api.get(`/assessments/${assessmentId}/start`);
+            console.log('Assessment start response:', response);
             
             if (response.success) {
                 this.currentAssessment = response.data.assessment;
@@ -30,23 +40,84 @@ const assessmentPage = {
                 this.timeRemaining = this.timeLimit;
                 this.userAnswers = new Array(this.questions.length).fill(undefined);
                 
+                // Clear the stored ID since we're using it now
+                sessionStorage.removeItem('currentAssessmentId');
+                
+                // For premium assessments, the backend should have already verified access
                 if (this.currentAssessment.is_premium) {
-                    // For premium assessments, check access (you might need to adjust this)
-                    const hasAccess = true; // You'll need to implement access check
-                    if (!hasAccess) {
-                        this.showPremiumWarning();
-                        return;
-                    }
+                    console.log('Premium assessment - access verified by backend');
                 }
 
                 this.renderAssessment();
                 this.startTimer();
+                
+                // Start lockdown AFTER the page is rendered
+                // In assessment.js - UPDATE the lockdown startup section in load method
+                // Start lockdown AFTER the page is rendered
+                //------------------------------------
+                // const shouldStartLockdown = sessionStorage.getItem('startLockdown') === 'true';
+                // sessionStorage.removeItem('startLockdown');
+
+                // if (shouldStartLockdown && typeof startLockdown !== "undefined") {
+                //     // Small delay to ensure DOM is ready
+                //     setTimeout(async () => {
+                //         try {
+                //             console.log('Attempting to start lockdown mode...');
+                //             await startLockdown(assessmentId, { 
+                //                 maxViolations: 3, 
+                //                 autoSubmitOnViolations: true 
+                //             });
+                //             console.log('Lockdown started successfully');
+                //         } catch (err) {
+                //             console.error("Lockdown failed:", err);
+                //             // Continue without lockdown but show warning
+                //             utils.showNotification("Security mode unavailable - continuing without fullscreen", "warning");
+                            
+                //             // Manually trigger fullscreen as fallback
+                //             try {
+                //                 const element = document.documentElement;
+                //                 if (element.requestFullscreen) {
+                //                     await element.requestFullscreen();
+                //                 } else if (element.webkitRequestFullscreen) {
+                //                     await element.webkitRequestFullscreen();
+                //                 } else if (element.msRequestFullscreen) {
+                //                     await element.msRequestFullscreen();
+                //                 }
+                //             } catch (fullscreenError) {
+                //                 console.error('Fallback fullscreen also failed:', fullscreenError);
+                //             }
+                //         }
+                //     }, 500);
+                // }
+                
             } else {
+                console.error('Assessment start failed:', response.error);
+                // Better error handling for premium assessments
+                if (response.error && (response.error.includes('payment') || response.error.includes('access') || response.error.includes('Payment'))) {
+                    // Redirect to payment page for premium assessments
+                    utils.showNotification('Payment required for this assessment', 'error');
+                    router.navigateTo(`/payment/${assessmentId}`);
+                    return;
+                }
                 throw new Error(response.error || 'Failed to load assessment');
             }
         } catch (error) {
             console.error('Error loading assessment:', error);
+            
+            // Specific handling for premium access errors
+            if (error.message.includes('payment') || error.message.includes('access') || error.message.includes('Payment')) {
+                utils.showNotification('Payment required for this assessment', 'error');
+                router.navigateTo(`/payment/${assessmentId}`);
+                return;
+            }
+            
             utils.showNotification(error.message, 'error');
+            
+            // Ensure lockdown is stopped on error
+            if (typeof Lockdown !== "undefined" && Lockdown.stop) {
+                Lockdown.stop();
+            }
+            
             router.navigateTo(config.ROUTES.ASSESSMENTS);
         } finally {
             utils.hideLoading();
@@ -273,6 +344,14 @@ const assessmentPage = {
         },
 
     async submitAssessment() {
+        // Stop timer and lockdown first
+        this.stopTimer();
+        
+        // Exit lockdown mode before navigating away
+        if (typeof Lockdown !== "undefined" && Lockdown.stop) {
+            Lockdown.stop();
+        }
+        
         // Check if all questions are answered
         const unansweredQuestions = this.userAnswers.filter(answer => answer === undefined);
         
@@ -294,12 +373,6 @@ const assessmentPage = {
             });
 
             if (response.success) {
-                this.stopTimer();
-                // ✅ Exit lockdown mode before navigating away
-                if (typeof Lockdown !== "undefined") {
-                    //stopLockdown();
-                    Lockdown.stop();
-                }
                 this.resetState();
                 utils.showNotification('Assessment submitted successfully!', 'success');
                 

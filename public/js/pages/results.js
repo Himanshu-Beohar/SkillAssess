@@ -85,11 +85,6 @@ const resultsPage = {
                         </div>
                     </div>
                 </div>
-
-                <!-- Rest of your content remains the same -->
-                <div class="results-filters">
-                <!-- ... filters code ... -->
-                </div>
             </div>
 
                 <!-- Filters -->
@@ -357,7 +352,7 @@ const resultsPage = {
     },
 
     downloadCertificate(resultId) {
-        utils.showNotification('Certificate download will be available soon!', 'info');
+        utils.showNotification('Certificate download will be available soon!\nYou will receive certificates through email for now.', 'info');
     },
 
     showEmptyState() {

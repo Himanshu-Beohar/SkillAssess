@@ -10,6 +10,8 @@ const router = {
             [config.ROUTES.HOME]: homePage,
             [config.ROUTES.LOGIN]: loginPage,
             [config.ROUTES.REGISTER]: registerPage,
+            '/forgot-password': forgotPasswordPage,
+            '/reset-password/:token': resetPasswordPage,
             [config.ROUTES.ASSESSMENTS]: assessmentsPage,
             [config.ROUTES.PROFILE]: profilePage,
             [config.ROUTES.RESULTS]: resultsPage,
@@ -53,12 +55,160 @@ const router = {
     },
 
     // Load route
+    // async loadRoute(route, updateHistory = false, data = {}) {
+    //     try {
+    //         utils.showLoading();
+
+    //         // Parse route parameters
+    //         this.parseRouteParams(route);
+
+    //         // Get route handler (support for parameterized routes)
+    //         let routeHandler = this.routes[route];
+    //         if (!routeHandler) {
+    //             // Check for parameterized routes
+    //             for (const routePattern in this.routes) {
+    //                 if (routePattern.includes(':')) {
+    //                     const patternRegex = new RegExp('^' + routePattern.replace(/:\w+/g, '([^/]+)') + '$');
+    //                     if (patternRegex.test(route)) {
+    //                         routeHandler = this.routes[routePattern];
+    //                         break;
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         // Default to home if no route found
+    //         if (!routeHandler) {
+    //             routeHandler = homePage;
+    //         }
+
+    //         // Check authentication for protected routes
+    //         if (route !== config.ROUTES.HOME && 
+    //             route !== config.ROUTES.LOGIN && 
+    //             route !== config.ROUTES.REGISTER) {
+    //             if (!auth.isAuthenticated()) {
+    //                 this.navigateTo(config.ROUTES.LOGIN);
+    //                 return;
+    //             }
+    //         }
+
+    //         // Redirect to home if already authenticated and trying to access auth pages
+    //         if ((route === config.ROUTES.LOGIN || route === config.ROUTES.REGISTER) && 
+    //             auth.isAuthenticated()) {
+    //             this.navigateTo(config.ROUTES.HOME);
+    //             return;
+    //         }
+
+    //         // Load the page with route parameters
+    //         await routeHandler.load({ ...this.routeParams, ...data });
+    //         this.currentRoute = route;
+
+    //         // Update active nav link
+    //         this.updateActiveNavLink(route);
+
+    //     } catch (error) {
+    //         console.error('Error loading route:', error);
+    //         utils.showNotification('Error loading page', 'error');
+    //         this.navigateTo(config.ROUTES.HOME);
+    //     } finally {
+    //         utils.hideLoading();
+    //     }
+    // },
+
+    // async loadRoute(route, updateHistory = false, data = {}) {
+    //     try {
+    //         utils.showLoading();
+
+    //         // 🔹 Normalize route
+    //         if (route.length > 1 && route.endsWith('/')) {
+    //         route = route.slice(0, -1); // strip trailing slash
+    //         }
+    //         if (route.startsWith('#')) {
+    //         route = route.replace(/^#/, ''); // strip leading #
+    //         }
+    //         if (route.includes('?')) {
+    //         route = route.split('?')[0]; // strip query params
+    //         }
+
+    //         // Parse route parameters
+    //         this.parseRouteParams(route);
+
+    //         // Get route handler (support for parameterized routes)
+    //         let routeHandler = this.routes[route];
+    //         if (!routeHandler) {
+    //         // Check for parameterized routes
+    //         for (const routePattern in this.routes) {
+    //             if (routePattern.includes(':')) {
+    //             const patternRegex = new RegExp(
+    //                 '^' + routePattern.replace(/:\w+/g, '([^/]+)') + '$'
+    //             );
+    //             if (patternRegex.test(route)) {
+    //                 routeHandler = this.routes[routePattern];
+    //                 break;
+    //             }
+    //             }
+    //         }
+    //         }
+
+    //         // Default to home if no route found
+    //         if (!routeHandler) {
+    //         routeHandler = homePage;
+    //         }
+
+    //         // Check authentication for protected routes
+    //         if (
+    //         route !== config.ROUTES.HOME &&
+    //         route !== config.ROUTES.LOGIN &&
+    //         route !== config.ROUTES.REGISTER &&
+    //         route !== '/forgot-password' &&
+    //         !route.startsWith('/reset-password')
+    //         ) {
+    //         if (!auth.isAuthenticated()) {
+    //             this.navigateTo(config.ROUTES.LOGIN);
+    //             return;
+    //         }
+    //         }
+
+    //         // Redirect to home if already authenticated and trying to access auth pages
+    //         if (
+    //         (route === config.ROUTES.LOGIN || route === config.ROUTES.REGISTER) &&
+    //         auth.isAuthenticated()
+    //         ) {
+    //         this.navigateTo(config.ROUTES.HOME);
+    //         return;
+    //         }
+
+    //         // Load the page with route parameters
+    //         await routeHandler.load({ ...this.routeParams, ...data });
+    //         this.currentRoute = route;
+
+    //         // Update active nav link
+    //         this.updateActiveNavLink(route);
+    //     } catch (error) {
+    //         console.error('Error loading route:', error);
+    //         utils.showNotification('Error loading page', 'error');
+    //         this.navigateTo(config.ROUTES.HOME);
+    //     } finally {
+    //         utils.hideLoading();
+    //     }
+    // },
+
+    // In router.js - REPLACE the entire loadRoute method with this working version
     async loadRoute(route, updateHistory = false, data = {}) {
         try {
             utils.showLoading();
 
-            // Parse route parameters
+            // 🔹 Normalize route - Remove trailing slashes and query params
+            if (route.length > 1 && route.endsWith('/')) {
+                route = route.slice(0, -1);
+            }
+            if (route.includes('?')) {
+                route = route.split('?')[0];
+            }
+
+            // 🔹 Parse route parameters FIRST
             this.parseRouteParams(route);
+            console.log('Route params parsed:', this.routeParams); // Debug log
 
             // Get route handler (support for parameterized routes)
             let routeHandler = this.routes[route];
@@ -69,6 +219,7 @@ const router = {
                         const patternRegex = new RegExp('^' + routePattern.replace(/:\w+/g, '([^/]+)') + '$');
                         if (patternRegex.test(route)) {
                             routeHandler = this.routes[routePattern];
+                            console.log('Found parameterized route handler:', routePattern); // Debug log
                             break;
                         }
                     }
@@ -77,13 +228,16 @@ const router = {
 
             // Default to home if no route found
             if (!routeHandler) {
+                console.warn('No route handler found, defaulting to home');
                 routeHandler = homePage;
             }
 
             // Check authentication for protected routes
             if (route !== config.ROUTES.HOME && 
                 route !== config.ROUTES.LOGIN && 
-                route !== config.ROUTES.REGISTER) {
+                route !== config.ROUTES.REGISTER &&
+                route !== '/forgot-password' &&
+                !route.startsWith('/reset-password')) {
                 if (!auth.isAuthenticated()) {
                     this.navigateTo(config.ROUTES.LOGIN);
                     return;
@@ -97,8 +251,11 @@ const router = {
                 return;
             }
 
-            // Load the page with route parameters
-            await routeHandler.load({ ...this.routeParams, ...data });
+            // 🔹 Load the page with route parameters - THIS IS CRITICAL
+            const loadData = { ...this.routeParams, ...data };
+            console.log('Loading route with data:', { route, loadData }); // Debug log
+            
+            await routeHandler.load(loadData);
             this.currentRoute = route;
 
             // Update active nav link
@@ -114,25 +271,69 @@ const router = {
     },
 
     // Parse route parameters from URL
+    // parseRouteParams(route) {
+    //     this.routeParams = {};
+    //     const routeParts = route.split('/').filter(part => part);
+
+    //     console.log('Parsing route:', route, 'Parts:', routeParts); // Debug log
+        
+    //     for (const routePattern in this.routes) {
+    //         if (routePattern.includes(':')) {
+    //             const patternParts = routePattern.split('/').filter(part => part);
+
+    //              console.log('Checking pattern:', routePattern, 'Pattern parts:', patternParts); // Debug log
+                
+    //             if (patternParts.length === routeParts.length) {
+    //                 for (let i = 0; i < patternParts.length; i++) {
+    //                     if (patternParts[i].startsWith(':')) {
+    //                         const paramName = patternParts[i].substring(1);
+    //                         this.routeParams[paramName] = routeParts[i];
+    //                     }
+    //                 }
+    //                 break;
+    //             }
+    //         }
+    //     }
+    // },
+
+    // In router.js - ENSURE this parseRouteParams method exists and works
     parseRouteParams(route) {
         this.routeParams = {};
         const routeParts = route.split('/').filter(part => part);
+        
+        console.log('Parsing route:', route, 'Parts:', routeParts); // Debug log
         
         for (const routePattern in this.routes) {
             if (routePattern.includes(':')) {
                 const patternParts = routePattern.split('/').filter(part => part);
                 
+                console.log('Checking pattern:', routePattern, 'Pattern parts:', patternParts); // Debug log
+                
                 if (patternParts.length === routeParts.length) {
+                    let matches = true;
                     for (let i = 0; i < patternParts.length; i++) {
                         if (patternParts[i].startsWith(':')) {
+                            // This is a parameter, store it
                             const paramName = patternParts[i].substring(1);
                             this.routeParams[paramName] = routeParts[i];
+                            console.log('Found parameter:', paramName, '=', routeParts[i]); // Debug log
+                        } else if (patternParts[i] !== routeParts[i]) {
+                            // Static parts don't match
+                            matches = false;
+                            break;
                         }
                     }
-                    break;
+                    if (matches) {
+                        console.log('Route pattern matched:', routePattern); // Debug log
+                        break;
+                    } else {
+                        this.routeParams = {}; // Reset if no match
+                    }
                 }
             }
         }
+        
+        console.log('Final route params:', this.routeParams); // Debug log
     },
 
     // Update active navigation link

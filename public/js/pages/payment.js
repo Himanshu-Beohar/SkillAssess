@@ -5,9 +5,15 @@ const paymentPage = {
 
     async load(data) {
         console.log('Payment page loading with data:', data);
+
+        console.log('=== PAYMENT PAGE DEBUG ===');
+        console.log('Route data received:', data);
+        console.log('Router params:', router.getRouteParams());
+        console.log('Window location:', window.location.pathname);
         
         // Get assessment ID from route parameters or data
         let assessmentId = data?.id || router.getRouteParams().id;
+        console.log('Assessment ID found:', assessmentId);
         
         if (!assessmentId) {
             utils.showNotification('Assessment not found', 'error');

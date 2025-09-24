@@ -15,36 +15,62 @@ const Lockdown = {
   enabled: false,
 
   // Call this to start enforcement (await for fullscreen)
+  // In assessment-lockdown.js - UPDATE the start method with better user gesture handling
   async start(assessmentId, opts = {}) {
-    this.assessmentId = assessmentId;
-    this.maxViolations = opts.maxViolations ?? 3;
-    this.autoSubmit = opts.autoSubmitOnViolations ?? true;
-    this.violations = 0;
-    this.violationLog = [];
-    this.startedAt = Date.now();
-    this.enabled = true;
+      // Don't start if we're not on an assessment page (but allow starting from instructions page)
+      if (!window.location.pathname.includes('/assessment/') && 
+          !window.location.pathname.includes('/instructions')) {
+          console.warn('Lockdown not started: Not on assessment-related page');
+          return;
+      }
+      
+      try {
+          this.assessmentId = assessmentId;
+          this.maxViolations = opts.maxViolations ?? 3;
+          this.autoSubmit = opts.autoSubmitOnViolations ?? true;
+          this.violations = 0;
+          this.violationLog = [];
+          this.startedAt = Date.now();
+          this.enabled = true;
 
-    // Show rules modal or warning before starting if you like
-    // Request full screen
-    try {
-      await this.requestFullScreen();
-    } catch (err) {
-      utils.showNotification('Please allow fullscreen to continue the assessment', 'error');
-      throw err;
-    }
+          // Validate assessment ID
+          if (!assessmentId) {
+              throw new Error('Assessment ID is required');
+          }
 
-    // Register event listeners
-    this.addListeners();
+          console.log('Requesting fullscreen...');
+          
+          // 🔹 Request full screen IMMEDIATELY (within user gesture context)
+          await this.requestFullScreen();
+          
+          console.log('Fullscreen granted, setting up lockdown...');
+          
+          // Wait a bit to ensure fullscreen is stable
+          await new Promise(resolve => setTimeout(resolve, 300));
+          
+          // Verify we're actually in fullscreen
+          const isFullscreen = this.getFullscreenStatus();
+          if (!isFullscreen) {
+              throw new Error('Fullscreen mode not active');
+          }
 
-    // Start periodic check (optional)
-    this.checkInterval = setInterval(() => this.periodicCheck(), 2000);
+          // Register event listeners
+          this.addListeners();
 
-    // Inform server that assessment started (optional)
-    fetch(`/api/assessments/${this.assessmentId}/start`, {
-      method: 'GET',
-      headers: this._headers(),
-      body: JSON.stringify({ started_at: new Date().toISOString() })
-    }).catch(() => {});
+          // Start periodic check
+          this.checkInterval = setInterval(() => this.periodicCheck(), 2000);
+
+          console.log('Lockdown started successfully');
+          return true;
+          
+      } catch (err) {
+          this.enabled = false;
+          console.error('Lockdown start failed:', err);
+          
+          // Clean up on failure
+          this.stop();
+          throw err;
+      }
   },
 
   // Stop enforcement (called after submit).
@@ -55,8 +81,8 @@ const Lockdown = {
       clearInterval(this.checkInterval);
       this.checkInterval = null;
     }
-    if (document.fullscreenElement) {
-      document.exitFullscreen().catch(err => {
+    if (this.getFullscreenStatus()) {
+      this.exitFullScreen().catch(err => {
         console.warn('Error exiting fullscreen:', err);
       });
     }
@@ -64,11 +90,52 @@ const Lockdown = {
 
   // Request fullscreen on documentElement
   async requestFullScreen() {
-    const el = document.documentElement;
-    if (el.requestFullscreen) return el.requestFullscreen();
-    if (el.webkitRequestFullscreen) return el.webkitRequestFullscreen();
-    if (el.msRequestFullscreen) return el.msRequestFullscreen();
-    throw new Error('Fullscreen API not supported');
+    return new Promise((resolve, reject) => {
+      const el = document.documentElement;
+      
+      // Check if already in fullscreen
+      if (this.getFullscreenStatus()) {
+        resolve(true);
+        return;
+      }
+      
+      const onFullscreenChange = () => {
+        if (this.getFullscreenStatus()) {
+          // Clean up event listeners
+          document.removeEventListener('fullscreenchange', onFullscreenChange);
+          document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
+          resolve(true);
+        }
+      };
+      
+      // Set timeout for fullscreen request
+      const timeoutId = setTimeout(() => {
+        document.removeEventListener('fullscreenchange', onFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
+        reject(new Error('Fullscreen request timed out'));
+      }, 2000);
+      
+      // Add event listeners
+      document.addEventListener('fullscreenchange', onFullscreenChange);
+      document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+      
+      // Request fullscreen
+      try {
+        if (el.requestFullscreen) {
+          el.requestFullscreen().catch(reject);
+        } else if (el.webkitRequestFullscreen) {
+          el.webkitRequestFullscreen().catch(reject);
+        } else if (el.msRequestFullscreen) {
+          el.msRequestFullscreen().catch(reject);
+        } else {
+          clearTimeout(timeoutId);
+          reject(new Error('Fullscreen API not supported'));
+        }
+      } catch (error) {
+        clearTimeout(timeoutId);
+        reject(error);
+      }
+    });
   },
 
   // Exit fullscreen programmatically (if needed)
@@ -78,10 +145,17 @@ const Lockdown = {
     if (document.msExitFullscreen) return document.msExitFullscreen();
   },
 
+  // Check fullscreen status
+  getFullscreenStatus() {
+    return !!(document.fullscreenElement || 
+              document.webkitFullscreenElement || 
+              document.msFullscreenElement);
+  },
+
   addListeners() {
     // fullscreen state change
     this._fsHandler = () => {
-      const fs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+      const fs = this.getFullscreenStatus();
       if (!fs && this.enabled) {
         this.logViolation('exit_fullscreen', 'User left fullscreen');
         // immediate auto-submit on fullscreen exit
@@ -173,27 +247,45 @@ const Lockdown = {
   },
 
   removeListeners() {
-    document.removeEventListener('fullscreenchange', this._fsHandler);
-    document.removeEventListener('webkitfullscreenchange', this._fsHandler);
-    document.removeEventListener('msfullscreenchange', this._fsHandler);
-    document.removeEventListener('visibilitychange', this._visibilityHandler);
-    window.removeEventListener('blur', this._blurHandler);
-    document.removeEventListener('keydown', this._keyHandler, true);
-    document.removeEventListener('contextmenu', this._contextHandler);
-    document.removeEventListener('copy', this._copyHandler);
-    document.removeEventListener('paste', this._pasteHandler);
-    document.removeEventListener('drop', this._dropHandler);
-    document.removeEventListener('dragover', this._dropHandler);
+    if (this._fsHandler) {
+      document.removeEventListener('fullscreenchange', this._fsHandler);
+      document.removeEventListener('webkitfullscreenchange', this._fsHandler);
+      document.removeEventListener('msfullscreenchange', this._fsHandler);
+    }
+    if (this._visibilityHandler) {
+      document.removeEventListener('visibilitychange', this._visibilityHandler);
+    }
+    if (this._blurHandler) {
+      window.removeEventListener('blur', this._blurHandler);
+    }
+    if (this._keyHandler) {
+      document.removeEventListener('keydown', this._keyHandler, true);
+    }
+    if (this._contextHandler) {
+      document.removeEventListener('contextmenu', this._contextHandler);
+    }
+    if (this._copyHandler) {
+      document.removeEventListener('copy', this._copyHandler);
+    }
+    if (this._pasteHandler) {
+      document.removeEventListener('paste', this._pasteHandler);
+    }
+    if (this._dropHandler) {
+      document.removeEventListener('drop', this._dropHandler);
+      document.removeEventListener('dragover', this._dropHandler);
+    }
   },
 
   // periodic check: ensure still fullscreen (fallback) and check window size
   periodicCheck() {
     if (!this.enabled) return;
-    const fs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+    
+    const fs = this.getFullscreenStatus();
     if (!fs) {
       this.logViolation('fs_missing_check', 'Fullscreen missing during periodic check');
       this.handleMaxViolationsCheck();
     }
+    
     // optionally detect small viewport size (user resized or windowed)
     const minWidth = 1024;
     if (window.innerWidth < minWidth) {
@@ -226,7 +318,9 @@ const Lockdown = {
     }
 
     // show small notification to user (optional)
-    utils.showNotification(`Security violation detected: ${message}`, 'warning');
+    if (typeof utils !== 'undefined' && utils.showNotification) {
+      utils.showNotification(`Security violation detected: ${message}`, 'warning');
+    }
   },
 
   // check and handle max violations (submit or block)
@@ -234,7 +328,9 @@ const Lockdown = {
     if (this.violations >= this.maxViolations) {
       // Option 1: auto submit
       if (this.autoSubmit) {
-        utils.showNotification('Max security violations reached. Assessment will be submitted.', 'error');
+        if (typeof utils !== 'undefined' && utils.showNotification) {
+          utils.showNotification('Max security violations reached. Assessment will be submitted.', 'error');
+        }
         // Wait a fraction then call your existing submit handler
         setTimeout(async () => {
           try {
@@ -249,7 +345,9 @@ const Lockdown = {
                 body: JSON.stringify({ reason: 'max_violations', violations: this.violationLog })
               });
               // navigate to results or show message
-              router.navigateTo(config.ROUTES.RESULTS);
+              if (typeof router !== 'undefined' && router.navigateTo) {
+                router.navigateTo(config.ROUTES.RESULTS);
+              }
             }
           } catch (err) {
             console.error('Auto-submit failed', err);
@@ -271,9 +369,57 @@ const Lockdown = {
     const token = auth && auth.getToken && auth.getToken();
     if (token) headers['Authorization'] = `Bearer ${token}`;
     return headers;
-  }
+  },
 
-  
+  // Emergency exit function
+  async emergencyExit() {
+    console.warn('Emergency lockdown exit triggered');
+    this.enabled = false;
+    
+    // Stop listeners and intervals first
+    this.stop();
+    
+    // Exit fullscreen with proper promise handling
+    try {
+      if (this.getFullscreenStatus()) {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          await document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          await document.msExitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn('Error exiting fullscreen:', err);
+    }
+    
+    // Navigate away
+    setTimeout(() => {
+      if (typeof router !== 'undefined' && router.navigateTo) {
+        router.navigateTo(config.ROUTES.ASSESSMENTS);
+      } else {
+        window.location.href = '/assessments';
+      }
+    }, 500);
+    
+    if (typeof utils !== 'undefined' && utils.showNotification) {
+      utils.showNotification('Emergency exit from assessment mode', 'warning');
+    }
+  }
+};
+
+// Make it globally available for emergency use
+window.emergencyLockdownExit = () => {
+  if (typeof Lockdown !== "undefined" && Lockdown.emergencyExit) {
+    Lockdown.emergencyExit();
+  } else {
+    // Fallback emergency exit
+    if (document.exitFullscreen) document.exitFullscreen();
+    if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    if (document.msExitFullscreen) document.msExitFullscreen();
+    window.location.href = '/assessments';
+  }
 };
 
 // Exported helper to call

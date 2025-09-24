@@ -166,26 +166,36 @@ const assessmentsPage = {
         const html = `
             <div class="page-container">
                 <div class="page-header">
-                    <h1>Available Assessments</h1>
-                    <p>Choose from our selection of free and premium assessments.</p>
+                <h1>📚 Available Assessments</h1>
+                <p>Browse free and premium assessments to test your skills and grow faster.</p>
                 </div>
 
                 <div class="filters-section">
+                <div class="filter-toolbar">
+                    <!-- Filter dropdown -->
                     <div class="filter-group">
-                        <label>Filter by:</label>
-                        <select id="filter-type" class="form-control">
-                            <option value="all">All Assessments</option>
-                            <option value="free">Free Only</option>
-                            <option value="premium">Premium Only</option>
-                        </select>
+                    <label for="filter-type"><i class="fas fa-filter"></i> Filter by</label>
+                    <select id="filter-type" class="form-control">
+                        <option value="all">All Assessments</option>
+                        <option value="free">Free Only</option>
+                        <option value="premium">Premium Only</option>
+                    </select>
                     </div>
+
+                    <!-- Search bar -->
                     <div class="search-group">
-                        <input type="text" id="search-input" class="form-control" placeholder="Search assessments...">
-                        <button class="btn btn-primary" onclick="assessmentsPage.searchAssessments()">
-                            <i class="fas fa-search"></i>
-                        </button>
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        class="form-control" 
+                        placeholder="🔍 Search assessments...">
+                    <button class="btn btn-primary" onclick="assessmentsPage.searchAssessments()">
+                        Search
+                    </button>
                     </div>
                 </div>
+                </div>
+
 
                 <div class="assessments-grid" id="assessments-container">
                     ${assessments.map(assessment => this.renderAssessmentCard(assessment)).join('')}

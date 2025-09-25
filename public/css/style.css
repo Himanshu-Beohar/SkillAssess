@@ -3832,3 +3832,22 @@ footer {
   border-radius: 6px;
   font-size: 1rem;
 }
+
+
+
+.premium-lock {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px dashed #f39c12;
+  border-radius: 8px;
+  background: #fff8e6;
+  text-align: center;
+  font-size: 14px;
+}
+.premium-lock i {
+  color: #f39c12;
+  margin-right: 6px;
+}
+.premium-lock button {
+  margin-top: 8px;
+}

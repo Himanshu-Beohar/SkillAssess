@@ -81,7 +81,7 @@ const emailService = {
         </ul>
         
         <p style="text-align:center; margin:20px 0;">
-          <a href="${process.env.FRONTEND_URL || 'http://skillassess.gyanovation.com'}" 
+          <a href="${process.env.CLIENT_URL || 'https://skillassess.gyanovation.com'}" 
             style="background:#28a745; color:white; padding:14px 28px; text-decoration:none; border-radius:6px; font-weight:bold;">
             Start Exploring
           </a>
@@ -113,7 +113,7 @@ const emailService = {
         <p><strong>Amount Paid:</strong> ₹${payment.amount}</p>
         
         <p style="text-align:center; margin:20px 0;">
-          <a href="${process.env.FRONTEND_URL || 'http://skillassess.gyanovation.com'}/my-assessments" 
+          <a href="${process.env.CLIENT_URL || 'https://skillassess.gyanovation.com'}/my-assessments" 
             style="background:#007BFF; color:white; padding:14px 28px; text-decoration:none; border-radius:6px; font-weight:bold;">
             Start My Assessment
           </a>
@@ -156,7 +156,7 @@ const emailService = {
         </ul>
         
         <p style="text-align:center; margin:20px 0;">
-          <a href="${process.env.FRONTEND_URL || 'http://skillassess.gyanovation.com'}/assessments" 
+          <a href="${process.env.CLIENT_URL || 'https://skillassess.gyanovation.com'}/assessments" 
             style="background:#17a2b8; color:white; padding:14px 28px; text-decoration:none; border-radius:6px; font-weight:bold;">
             Practice More
           </a>
@@ -175,7 +175,7 @@ const emailService = {
 
 
   async sendPasswordResetEmail(user, resetToken) {
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.CLIENT_URL || 'https://skillassess.gyanovation.com'}/reset-password/${resetToken}`;
     const subject = '🔑 Reset Your Password';
     const html = wrapTemplate(
       "Password Reset",

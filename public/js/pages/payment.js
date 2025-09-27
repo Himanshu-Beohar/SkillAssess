@@ -244,15 +244,38 @@ const paymentPage = {
                     <!-- FAQ -->
                     <div class="faq-section">
                     <h3>❓ Frequently Asked Questions</h3>
+
                     <div class="faq-item">
-                        <strong>What happens after payment?</strong>
-                        <p>You get instant access to the assessment and a confirmation email.</p>
+                        <div class="faq-question">
+                        <span>What happens after payment?</span>
+                        <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                        <p>You'll get instant access to the assessment and a confirmation email right away.</p>
+                        </div>
                     </div>
+
                     <div class="faq-item">
-                        <strong>Is there a refund policy?</strong>
-                        <p>Yes. A 30-day money-back guarantee if you're not satisfied.</p>
+                        <div class="faq-question">
+                        <span>Is there a refund policy?</span>
+                        <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                        <p>Yes! We offer a 30-day money-back guarantee if you're not satisfied.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                        <span>How many attempts do I get?</span>
+                        <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                        <p>You’ll have 3 attempts included with your one-time payment.</p>
+                        </div>
                     </div>
                     </div>
+
                 </div>
 
                 <!-- RIGHT: Payment Card -->

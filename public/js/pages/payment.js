@@ -244,38 +244,34 @@ const paymentPage = {
                     <!-- FAQ -->
                     <div class="faq-section">
                     <h3>❓ Frequently Asked Questions</h3>
-
                     <div class="faq-item">
                         <div class="faq-question">
-                        <span>What happens after payment?</span>
-                        <i class="fas fa-chevron-down"></i>
+                            <span>What happens after payment?</span>
+                            <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                        <p>You'll get instant access to the assessment and a confirmation email right away.</p>
+                            <p>Immediate access to the assessment. You'll receive a confirmation email and can start immediately.</p>
                         </div>
                     </div>
-
                     <div class="faq-item">
                         <div class="faq-question">
-                        <span>Is there a refund policy?</span>
-                        <i class="fas fa-chevron-down"></i>
+                            <span>Is there a refund policy?</span>
+                            <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                        <p>Yes! We offer a 30-day money-back guarantee if you're not satisfied.</p>
+                            <p>Yes! We offer a 30-day money-back guarantee if you're not satisfied.</p>
                         </div>
                     </div>
-
                     <div class="faq-item">
                         <div class="faq-question">
-                        <span>How many attempts do I get?</span>
-                        <i class="fas fa-chevron-down"></i>
+                            <span>How many attempts do I get?</span>
+                            <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="faq-answer">
-                        <p>You’ll have 3 attempts included with your one-time payment.</p>
+                            <p>You’ll have 3 attempts included with your one-time payment.</p>
                         </div>
                     </div>
                     </div>
-
                 </div>
 
                 <!-- RIGHT: Payment Card -->
@@ -311,6 +307,24 @@ const paymentPage = {
 
         
         document.getElementById('page-content').innerHTML = html;
+
+        // 🎯 FAQ Accordion Toggle
+        document.querySelectorAll(".faq-question").forEach((question) => {
+            question.addEventListener("click", () => {
+                const faqItem = question.parentElement;
+                const wasActive = faqItem.classList.contains("active");
+                
+                // Close all FAQ items
+                document.querySelectorAll(".faq-item").forEach(item => {
+                    item.classList.remove("active");
+                });
+                
+                // Open current if it wasn't active before
+                if (!wasActive) {
+                    faqItem.classList.add("active");
+                }
+            });
+        });
         
         // Add event listeners
         document.getElementById("payBtn").addEventListener("click", () => this.initiatePayment());

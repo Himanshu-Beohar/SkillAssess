@@ -1,3 +1,7 @@
+function isMobileDevice() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
 const assessmentInstructionsPage = {
   currentAssessment: null,
 
@@ -194,6 +198,11 @@ const assessmentInstructionsPage = {
         const startBtn = document.getElementById("instruction-start-btn");
         if (startBtn) {
             startBtn.addEventListener("click", async () => {
+
+                if (isMobileDevice()) {
+                    utils.showNotification("📵 To start the assessment, please use a laptop or desktop computer.", "warning");
+                    return; // ⛔ Stop execution here
+                }
                 try {
                     if (typeof assessmentPage !== "undefined" && assessmentPage.resetState) {
                         assessmentPage.resetState();

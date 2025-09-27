@@ -166,6 +166,17 @@ const assessmentInstructionsPage = {
         const startBtn = document.getElementById("instruction-start-btn");
         if (startBtn) {
             startBtn.addEventListener("click", async () => {
+                console.log("📱 User Agent:", navigator.userAgent);
+                console.log("📱 Detected mobile:", isMobileDevice());
+                // 📱 Block mobile users here
+                if (isMobileDevice()) {
+                    utils.showNotification(
+                        "📵 To start the assessment, please use a laptop or desktop computer.",
+                        "warning"
+                    );
+                    return;
+                }
+
                 try {
                     // Reset assessment state
                     if (typeof assessmentPage !== "undefined" && assessmentPage.resetState) {

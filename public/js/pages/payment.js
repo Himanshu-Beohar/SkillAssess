@@ -48,145 +48,244 @@ const paymentPage = {
     },
 
     renderModernPaymentPage() {
+        // const html = `
+        //     <div class="modern-payment-container">
+        //         <!-- Premium Header -->
+        //         <div class="premium-header">
+        //             <div class="premium-badge">
+        //                 <i class="fas fa-crown"></i>
+        //                 <span>Premium Assessment</span>
+        //             </div>
+        //             <h1 class="premium-title">Unlock Premium Access</h1>
+        //             <p class="premium-subtitle">Elevate your learning experience with exclusive content</p>
+        //         </div>
+
+        //         <!-- Payment Card -->
+        //         <div class="modern-payment-card">
+        //             <div class="payment-hero">
+        //                 <div class="assessment-preview">
+        //                     <i class="fas fa-graduation-cap"></i>
+        //                     <h2>${this.currentAssessment.title}</h2>
+        //                     <p>${this.currentAssessment.description || 'Premium assessment with detailed analytics'}</p>
+        //                 </div>
+                        
+        //                 <div class="price-display">
+        //                     <div class="price-amount">
+        //                         ${utils.formatCurrency(this.currentAssessment.price)}
+        //                     </div>
+        //                     <div class="price-info">One-time payment • 3 Attempts access</div>
+        //                 </div>
+        //             </div>
+
+        //             <!-- Features Grid -->
+        //             <div class="features-grid">
+        //                 <div class="feature-item">
+        //                     <div class="feature-icon">
+        //                         <i class="fas fa-infinity"></i>
+        //                     </div>
+        //                     <div class="feature-content">
+        //                         <h4>3 Attempts Access</h4>
+        //                         <p>Three attempts free</p>
+        //                     </div>
+        //                 </div>
+                        
+        //                 <div class="feature-item">
+        //                     <div class="feature-icon">
+        //                         <i class="fas fa-chart-line"></i>
+        //                     </div>
+        //                     <div class="feature-content">
+        //                         <h4>Advanced Analytics</h4>
+        //                         <p>Detailed performance insights</p>
+        //                     </div>
+        //                 </div>
+                        
+        //                 <div class="feature-item">
+        //                     <div class="feature-icon">
+        //                         <i class="fas fa-trophy"></i>
+        //                     </div>
+        //                     <div class="feature-content">
+        //                         <h4>Certificate</h4>
+        //                         <p>Digital certificate of completion via email, within few hours</p>
+        //                     </div>
+        //                 </div>
+                        
+        //                 <div class="feature-item">
+        //                     <div class="feature-icon">
+        //                         <i class="fas fa-users"></i>
+        //                     </div>
+        //                     <div class="feature-content">
+        //                         <h4>Earn Badges</h4>
+        //                         <p>Checkout Wins page for more details</p>
+        //                     </div>
+        //                 </div>
+        //             </div>
+
+        //             <!-- Payment Actions -->
+        //             <div class="payment-actions-modern">
+        //                 <button id="payBtn" class="btn-premium-pay">
+        //                     <span class="btn-content">
+        //                         <i class="fas fa-lock"></i>
+        //                         <span>Secure Payment</span>
+        //                         <span class="price-btn">${utils.formatCurrency(this.currentAssessment.price)}</span>
+        //                     </span>
+        //                 </button>
+                        
+        //                 <button id="cancelBtn" class="btn-outline-modern">
+        //                     <i class="fas fa-arrow-left"></i>
+        //                     Back to Assessments
+        //                 </button>
+        //             </div>
+
+        //             <!-- Security & Trust -->
+        //             <div class="security-section">
+        //                 <div class="security-badges">
+        //                     <div class="security-item">
+        //                         <i class="fas fa-shield-alt"></i>
+        //                         <span>256-bit SSL Encryption</span>
+        //                     </div>
+        //                     <div class="security-item">
+        //                         <i class="fas fa-lock"></i>
+        //                         <span>PCI DSS Compliant</span>
+        //                     </div>
+        //                     <div class="security-item">
+        //                         <i class="fas fa-check-circle"></i>
+        //                         <span>Money Back Guarantee</span>
+        //                     </div>
+        //                 </div>
+                        
+        //                 <div class="trust-pilot">
+        //                     <div class="trust-rating">
+        //                         <div class="stars">★★★★★</div>
+        //                         <span>4.9/5 from 2,500+ learners</span>
+        //                     </div>
+        //                 </div>
+        //             </div>
+
+        //             <!-- FAQ Section -->
+        //             <div class="faq-section">
+        //                 <h3>Frequently Asked Questions</h3>
+        //                 <div class="faq-item">
+        //                     <div class="faq-question">
+        //                         <span>What happens after payment?</span>
+        //                         <i class="fas fa-chevron-down"></i>
+        //                     </div>
+        //                     <div class="faq-answer">
+        //                         <p>Immediate access to the assessment. You'll receive a confirmation email and can start immediately.</p>
+        //                     </div>
+        //                 </div>
+                        
+        //                 <div class="faq-item">
+        //                     <div class="faq-question">
+        //                         <span>Is there a refund policy?</span>
+        //                         <i class="fas fa-chevron-down"></i>
+        //                     </div>
+        //                     <div class="faq-answer">
+        //                         <p>Yes! 30-day money-back guarantee if you're not satisfied with the assessment quality.</p>
+        //                     </div>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     </div>
+        // `;
+
         const html = `
             <div class="modern-payment-container">
-                <!-- Premium Header -->
-                <div class="premium-header">
+
+                <div class="payment-layout">
+                <!-- LEFT: Assessment Details -->
+                <div class="payment-left">
+
+                    <div class="premium-header">
                     <div class="premium-badge">
                         <i class="fas fa-crown"></i>
                         <span>Premium Assessment</span>
                     </div>
                     <h1 class="premium-title">Unlock Premium Access</h1>
                     <p class="premium-subtitle">Elevate your learning experience with exclusive content</p>
+                    </div>
+
+                    <div class="assessment-preview">
+                    <h2><i class="fas fa-graduation-cap"></i> ${this.currentAssessment.title}</h2>
+                    <p>${this.currentAssessment.description || 'Premium assessment with detailed analytics'}</p>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="features-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-infinity"></i>
+                        <div>
+                        <h4>3 Attempts Access</h4>
+                        <p>Three attempts included with one purchase</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <div>
+                        <h4>Advanced Analytics</h4>
+                        <p>Detailed insights into your performance</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-trophy"></i>
+                        <div>
+                        <h4>Certificate</h4>
+                        <p>Digital certificate emailed within hours</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-users"></i>
+                        <div>
+                        <h4>Earn Badges</h4>
+                        <p>Check out the Wins page for more</p>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- FAQ -->
+                    <div class="faq-section">
+                    <h3>❓ Frequently Asked Questions</h3>
+                    <div class="faq-item">
+                        <strong>What happens after payment?</strong>
+                        <p>You get instant access to the assessment and a confirmation email.</p>
+                    </div>
+                    <div class="faq-item">
+                        <strong>Is there a refund policy?</strong>
+                        <p>Yes. A 30-day money-back guarantee if you're not satisfied.</p>
+                    </div>
+                    </div>
                 </div>
 
-                <!-- Payment Card -->
-                <div class="modern-payment-card">
-                    <div class="payment-hero">
-                        <div class="assessment-preview">
-                            <i class="fas fa-graduation-cap"></i>
-                            <h2>${this.currentAssessment.title}</h2>
-                            <p>${this.currentAssessment.description || 'Premium assessment with detailed analytics'}</p>
-                        </div>
-                        
-                        <div class="price-display">
-                            <div class="price-amount">
-                                ${utils.formatCurrency(this.currentAssessment.price)}
-                            </div>
-                            <div class="price-info">One-time payment • Lifetime access</div>
-                        </div>
+                <!-- RIGHT: Payment Card -->
+                <div class="payment-right">
+                    <div class="modern-payment-card">
+                    <div class="price-display">
+                        <div class="price-amount">${utils.formatCurrency(this.currentAssessment.price)}</div>
+                        <div class="price-info">One-time payment • 3 attempts included</div>
                     </div>
 
-                    <!-- Features Grid -->
-                    <div class="features-grid">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-infinity"></i>
-                            </div>
-                            <div class="feature-content">
-                                <h4>Lifetime Access</h4>
-                                <p>Unlimited attempts forever</p>
-                            </div>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <div class="feature-content">
-                                <h4>Advanced Analytics</h4>
-                                <p>Detailed performance insights</p>
-                            </div>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-trophy"></i>
-                            </div>
-                            <div class="feature-content">
-                                <h4>Certificate</h4>
-                                <p>Digital certificate of completion</p>
-                            </div>
-                        </div>
-                        
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="feature-content">
-                                <h4>Leaderboard</h4>
-                                <p>Compare with other learners</p>
-                            </div>
-                        </div>
-                    </div>
+                    <button id="payBtn" class="btn-premium-pay">
+                        <i class="fas fa-lock"></i> Pay Securely — ${utils.formatCurrency(this.currentAssessment.price)}
+                    </button>
 
-                    <!-- Payment Actions -->
-                    <div class="payment-actions-modern">
-                        <button id="payBtn" class="btn-premium-pay">
-                            <span class="btn-content">
-                                <i class="fas fa-lock"></i>
-                                <span>Secure Payment</span>
-                                <span class="price-btn">${utils.formatCurrency(this.currentAssessment.price)}</span>
-                            </span>
-                        </button>
-                        
-                        <button id="cancelBtn" class="btn-outline-modern">
-                            <i class="fas fa-arrow-left"></i>
-                            Back to Assessments
-                        </button>
-                    </div>
+                    <button id="cancelBtn" class="btn-outline-modern">
+                        <i class="fas fa-arrow-left"></i> Back to Assessments
+                    </button>
 
-                    <!-- Security & Trust -->
                     <div class="security-section">
-                        <div class="security-badges">
-                            <div class="security-item">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>256-bit SSL Encryption</span>
-                            </div>
-                            <div class="security-item">
-                                <i class="fas fa-lock"></i>
-                                <span>PCI DSS Compliant</span>
-                            </div>
-                            <div class="security-item">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Money Back Guarantee</span>
-                            </div>
-                        </div>
-                        
-                        <div class="trust-pilot">
-                            <div class="trust-rating">
-                                <div class="stars">★★★★★</div>
-                                <span>4.9/5 from 2,500+ learners</span>
-                            </div>
-                        </div>
+                        <div class="security-item"><i class="fas fa-shield-alt"></i> 256-bit SSL Encryption</div>
+                        <div class="security-item"><i class="fas fa-lock"></i> PCI DSS Compliant</div>
+                        <div class="security-item"><i class="fas fa-check-circle"></i> Money Back Guarantee</div>
                     </div>
 
-                    <!-- FAQ Section -->
-                    <div class="faq-section">
-                        <h3>Frequently Asked Questions</h3>
-                        <div class="faq-item">
-                            <div class="faq-question">
-                                <span>What happens after payment?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="faq-answer">
-                                <p>Immediate access to the assessment. You'll receive a confirmation email and can start immediately.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="faq-item">
-                            <div class="faq-question">
-                                <span>Is there a refund policy?</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            <div class="faq-answer">
-                                <p>Yes! 30-day money-back guarantee if you're not satisfied with the assessment quality.</p>
-                            </div>
-                        </div>
+                    <div class="trust-rating">
+                        ⭐️⭐️⭐️⭐️⭐️ <span>4.9/5 from 2,500+ learners</span>
                     </div>
+                    </div>
+                </div>
                 </div>
             </div>
-        `;
+            `;
+
         
         document.getElementById('page-content').innerHTML = html;
         

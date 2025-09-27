@@ -51,7 +51,16 @@ const router = {
         
         // Update URL without reloading page
         window.history.pushState({}, '', route);
+
+        // Load the new route
         this.loadRoute(route, true, data);
+
+        // ✅ Always scroll to top after route change
+        requestAnimationFrame(() => {
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0; // Fallback
+            document.documentElement.scrollTop = 0; // Fallback for Safari/Edge
+        });
     },
 
     // Load route

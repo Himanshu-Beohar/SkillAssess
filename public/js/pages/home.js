@@ -76,38 +76,47 @@ const homePage = {
                     </div>
                 </section>
 
-                <!-- Career Impact Section -->
                 <section class="career-impact">
                     <div class="career-impact-container">
-                        <div class="career-text">
+                        <!-- LEFT: Text + Features -->
+                        <div class="career-left">
                         <h2>🚀 Boost Your Career</h2>
                         <p>
-                            Skillassess not only helps you <strong>learn and practice</strong> but also ensures 
-                            your <strong>achievements get recognized</strong>. By earning badges, certificates, 
-                            and recognition from Gyanovation, you can stand out from the crowd.
+                            Skillassess not only helps you <strong>learn and practice</strong> but also ensures your
+                            <strong>achievements get recognized</strong>. By earning badges, certificates, and recognition from Gyanovation,
+                            you can stand out from the crowd.
                         </p>
-                        <ul class="career-benefits">
-                            <li>
-                            <i class="fas fa-id-badge"></i> 
-                            Add verified credentials to your&nbsp;<strong>resume</strong>&nbsp;or portfolio.
-                            </li>
-                            <li>
-                            <i class="fas fa-briefcase"></i> 
-                            Gain an edge in&nbsp;<strong>job applications</strong>&nbsp;and interviews.
-                            </li>
-                            <li>
-                            <i class="fas fa-graduation-cap"></i> 
-                            Demonstrate your commitment to&nbsp;<strong>continuous learning</strong>.
-                            </li>
-                        </ul>
+
+                        <div class="career-benefits-grid">
+                            <div class="benefit">
+                            <i class="fas fa-id-badge"></i>
+                            <p>Add verified credentials to your <strong>resume</strong> or portfolio.</p>
+                            </div>
+                            <div class="benefit">
+                            <i class="fas fa-briefcase"></i>
+                            <p>Gain an edge in <strong>job applications</strong> and interviews.</p>
+                            </div>
+                            <div class="benefit">
+                            <i class="fas fa-graduation-cap"></i>
+                            <p>Demonstrate your commitment to <strong>continuous learning</strong>.</p>
+                            </div>
+                            <div class="benefit">
+                            <i class="fas fa-trophy"></i>
+                            <p><strong>Badges • Certificates • Recognition</strong></p>
+                            </div>
                         </div>
 
-                        <div class="career-visual">
-                        <i class="fas fa-trophy"></i>
-                        <p class="visual-caption">Badges • Certificates • Recognition</p>
+                        <a href="/assessments" class="cta-button">Start Your Journey</a>
+                        </div>
+
+                        <!-- RIGHT: Illustration -->
+                        <div class="career-right">
+                        <img src="/assets/images/career-growth.png" alt="Career Growth Illustration" />
                         </div>
                     </div>
                     </section>
+
+
 
 
                 <!-- Featured Assessments -->

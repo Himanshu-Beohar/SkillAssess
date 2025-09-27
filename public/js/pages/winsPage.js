@@ -175,14 +175,14 @@ const winsPage = {
                         
                         return `
                             <tr>
-                                <td>${result.assessment_title || 'Assessment'}</td>
-                                <td>${date}</td>
-                                <td>${percentage}%</td>
-                                <td>
-                                    <span class="status ${passed ? 'passed' : 'failed'}">
-                                        ${passed ? '✅ Passed' : '❌ Failed'}
-                                    </span>
-                                </td>
+                              <td data-label="Assessment">${result.assessment_title || 'Assessment'}</td>
+                              <td data-label="Date">${date}</td>
+                              <td data-label="Score">${percentage}%</td>
+                              <td data-label="Status">
+                                <span class="status ${passed ? 'passed' : 'failed'}">
+                                  ${passed ? '✅ Passed' : '❌ Failed'}
+                                </span>
+                              </td>
                             </tr>
                         `;
                       }).join('')}

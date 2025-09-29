@@ -8,8 +8,10 @@ const headerComponent = {
         const headerHTML = `
             <div class="header-content">
                 <div class="logo">
+                    <a href="${config.ROUTES.HOME}" class="logo">
                     <img src="/assets/images/skillassess_logo.png" alt="SkillAssess Logo" class="badge-logo">
                     <span>SkillAssess</span>
+                    </a>
                 </div>
                 
                 <!-- Mobile menu toggle button -->

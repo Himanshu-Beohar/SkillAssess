@@ -14,7 +14,7 @@ const footerComponent = {
                     <ul>
                         <li><a href="${config.ROUTES.HOME}">Skillassess Home</a></li>
                         <li><a href="${config.ROUTES.ASSESSMENTS}">Assessments</a></li>
-                        <li><a href="https://gyanovation.com/">Gyanovation Home</a></li>
+                        
                         <li><a href="https://gyanovation.com/contact-us/">Contact Us</a></li>
                     </ul>
                 </div>
@@ -31,9 +31,21 @@ const footerComponent = {
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 SkillAssess. All rights reserved. | Powered by Gyanovation Technologies</p>
-                <p>📞 +91-8085554178 | 📧 contact@gyanovation.com</p>
-
+                <p>
+                    &copy; 2025 SkillAssess. All rights reserved. | Powered by 
+                    <a href="https://gyanovation.com/" target="_blank" rel="noopener noreferrer">
+                        Gyanovation Technologies
+                    </a> | 📧 contact@gyanovation.com
+                </p>
+                <div class="footer-bottom">
+                <div class="footer-legal-links">
+                    <a href="https://gyanovation.com/disclamer/" target="_blank">Disclaimer</a> 
+                    <a href="https://gyanovation.com/terms-conditions/" target="_blank">Terms & Conditions</a>
+                    <a href="https://gyanovation.com/privacy-policy-2/" target="_blank">Privacy Policy</a>
+                    <a href="https://gyanovation.com/refund-cancellation-policy/" target="_blank">Refund & Cancellation</a>
+                    <a href="https://gyanovation.com/shipping-delivery/" target="_blank">Shipping & Delivery</a>
+                </div>
+                </div>
             </div>
         `;
         

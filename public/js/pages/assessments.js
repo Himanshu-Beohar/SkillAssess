@@ -6,24 +6,35 @@
 //         const html = `
 //             <div class="page-container">
 //                 <div class="page-header">
-//                     <h1>Available Assessments</h1>
-//                     <p>Choose from our selection of free and premium assessments.</p>
+//                     <h1>📚 Available Assessments</h1>
+//                     <p class="page-subtitle">
+//                         Browse free and premium assessments across various tech and professional domains. 
+//                         Practice real-world questions, track your performance, and strengthen the skills that matter most 
+//                         — from coding and data science to project management and cybersecurity.
+//                     </p>
 //                 </div>
 
-//                 <div class="filters-section">
-//                     <div class="filter-group">
-//                         <label>Filter by:</label>
-//                         <select id="filter-type" class="form-control">
-//                             <option value="all">All Assessments</option>
-//                             <option value="free">Free Only</option>
-//                             <option value="premium">Premium Only</option>
-//                         </select>
+//                 <div class="filter-toolbar">
+//                     <!-- ✅ Toggle Buttons -->
+//                     <div class="filter-group toggle-group">
+//                         <button class="toggle-btn active" data-value="all">All</button>
+//                         <button class="toggle-btn" data-value="free">Free</button>
+//                         <button class="toggle-btn" data-value="premium">Premium</button>
 //                     </div>
+
+//                     <!-- Search bar -->
 //                     <div class="search-group">
-//                         <input type="text" id="search-input" class="form-control" placeholder="Search assessments...">
-//                         <button class="btn btn-primary" onclick="assessmentsPage.searchAssessments()">
-//                             <i class="fas fa-search"></i>
-//                         </button>
+//                         <div class="search-wrapper">
+//                             <input 
+//                                 type="text" 
+//                                 id="search-input" 
+//                                 class="search-input" 
+//                                 placeholder="🔍 Search assessments..."
+//                             />
+//                             <button class="search-btn" onclick="assessmentsPage.searchAssessments()">
+//                                 <i class="fas fa-search"></i>
+//                             </button>
+//                         </div>
 //                     </div>
 //                 </div>
 
@@ -40,10 +51,10 @@
 //                 ` : ''}
 //             </div>
 //         `;
+
 //         document.getElementById('page-content').innerHTML = html;
 //         this.addEventListeners();
-//         this.addAssessmentButtonListeners(); // Add this line
-        
+//         this.addAssessmentButtonListeners(); 
 //     },
 
 //     renderAssessmentCard(assessment) {
@@ -64,9 +75,8 @@
 //                         </span>
 //                     </div>
 //                     <button class="btn ${assessment.is_premium ? 'btn-accent' : 'btn-primary'} btn-full assessment-button" 
-//                             data-assessment-id="${assessment.id}" 
-//                             data-is-premium="${assessment.is_premium}">
-//                         ${assessment.is_premium ? 'Purchase Access' : 'Start Assessment'}
+//                             data-assessment-id="${assessment.id}">
+//                         View Details
 //                     </button>
 //                 </div>
 //             </div>
@@ -74,10 +84,21 @@
 //     },
 
 //     addEventListeners() {
-//         const filterSelect = document.getElementById('filter-type');
-//         const searchInput = document.getElementById('search-input');
+//         // ✅ Toggle button listeners
+//         document.querySelectorAll(".toggle-btn").forEach(btn => {
+//             btn.addEventListener("click", (e) => {
+//                 // Update active button
+//                 document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+//                 btn.classList.add("active");
 
-//         filterSelect.addEventListener('change', this.filterAssessments.bind(this));
+//                 // Apply filter
+//                 const filterValue = btn.getAttribute("data-value");
+//                 this.filterAssessments(filterValue);
+//             });
+//         });
+
+//         // ✅ Search input listener
+//         const searchInput = document.getElementById('search-input');
 //         searchInput.addEventListener('input', utils.debounce(this.searchAssessments.bind(this), 300));
 //     },
 
@@ -92,22 +113,23 @@
 //         }
 //     },
 
-//     filterAssessments() {
-//         const filterType = document.getElementById('filter-type').value;
+//     // ✅ Updated filter function to work with toggle buttons
+//     filterAssessments(filterType) {
 //         const assessmentCards = document.querySelectorAll('.assessment-card');
 
 //         assessmentCards.forEach(card => {
 //             const isPremium = card.getAttribute('data-is-premium') === 'true';
-            
+//             let show = false;
+
 //             if (filterType === 'all') {
-//                 card.style.display = 'block';
+//                 show = true;
 //             } else if (filterType === 'free' && !isPremium) {
-//                 card.style.display = 'block';
+//                 show = true;
 //             } else if (filterType === 'premium' && isPremium) {
-//                 card.style.display = 'block';
-//             } else {
-//                 card.style.display = 'none';
+//                 show = true;
 //             }
+
+//             card.style.display = show ? 'block' : 'none';
 //         });
 //     },
 
@@ -127,15 +149,6 @@
 //         });
 //     },
 
-//     startAssessment(assessmentId, isPremium) {
-//         if (isPremium) {
-//             // Use router navigation instead of direct URL change
-//             router.navigateTo(`/payment/${assessmentId}`);
-//         } else {
-//             router.navigateTo(`/assessment/${assessmentId}`);
-//         }
-//     },
-    
 //     addAssessmentButtonListeners() {
 //         const buttons = document.querySelectorAll('.assessment-button');
 //         buttons.forEach(button => {
@@ -144,58 +157,58 @@
 //                 e.stopPropagation();
                 
 //                 const assessmentId = button.getAttribute('data-assessment-id');
-//                 const isPremium = button.getAttribute('data-is-premium') === 'true';
                 
-//                 console.log('Button clicked - Assessment ID:', assessmentId, 'Is Premium:', isPremium);
-                
-//                 if (isPremium) {
-//                     router.navigateTo(`/payment/${assessmentId}`);
-//                 } else {
-//                     router.navigateTo(`/assessment/${assessmentId}`);
-//                 }
+//                 console.log('Navigating to instructions for assessment:', assessmentId);
+//                 router.navigateTo(`/assessment/${assessmentId}/instructions`);
 //             });
 //         });
 //     }
 // };
 
+
 // Assessments page
 const assessmentsPage = {
     async load() {
+        // ✅ 1. Check if a filter query parameter exists
+        const urlParams = new URLSearchParams(window.location.search);
+        const preselectedFilter = urlParams.get("filter") || "all";
+
         const assessments = await this.loadAssessments();
         
         const html = `
             <div class="page-container">
                 <div class="page-header">
-                <h1>📚 Available Assessments</h1>
-                <p>Browse free and premium assessments to test your skills and grow faster.</p>
+                    <h1>📚 Available Assessments</h1>
+                    <p class="page-subtitle">
+                        Browse free and premium assessments across various tech and professional domains. 
+                        Practice real-world questions, track your performance, and strengthen the skills that matter most 
+                        — from coding and data science to project management and cybersecurity.
+                    </p>
                 </div>
 
-                <div class="filters-section">
                 <div class="filter-toolbar">
-                    <!-- Filter dropdown -->
-                    <div class="filter-group">
-                    <label for="filter-type"><i class="fas fa-filter"></i> Filter by</label>
-                    <select id="filter-type" class="form-control">
-                        <option value="all">All Assessments</option>
-                        <option value="free">Free Only</option>
-                        <option value="premium">Premium Only</option>
-                    </select>
+                    <!-- ✅ Toggle Buttons -->
+                    <div class="filter-group toggle-group">
+                        <button class="toggle-btn" data-value="all">All</button>
+                        <button class="toggle-btn" data-value="free">Free</button>
+                        <button class="toggle-btn" data-value="premium">Premium</button>
                     </div>
 
                     <!-- Search bar -->
                     <div class="search-group">
-                    <input 
-                        type="text" 
-                        id="search-input" 
-                        class="form-control" 
-                        placeholder="🔍 Search assessments...">
-                    <button class="btn btn-primary" onclick="assessmentsPage.searchAssessments()">
-                        Search
-                    </button>
+                        <div class="search-wrapper">
+                            <input 
+                                type="text" 
+                                id="search-input" 
+                                class="search-input" 
+                                placeholder="🔍 Search assessments..."
+                            />
+                            <button class="search-btn" onclick="assessmentsPage.searchAssessments()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                </div>
-
 
                 <div class="assessments-grid" id="assessments-container">
                     ${assessments.map(assessment => this.renderAssessmentCard(assessment)).join('')}
@@ -210,9 +223,23 @@ const assessmentsPage = {
                 ` : ''}
             </div>
         `;
+
         document.getElementById('page-content').innerHTML = html;
+
+        // ✅ 2. Set up event listeners
         this.addEventListeners();
         this.addAssessmentButtonListeners(); 
+
+        // ✅ 3. Automatically activate the correct toggle and filter
+        const defaultBtn = document.querySelector(`.toggle-btn[data-value="${preselectedFilter}"]`);
+        if (defaultBtn) {
+            document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+            defaultBtn.classList.add("active");
+            this.filterAssessments(preselectedFilter);
+        }
+
+        // ✅ 4. (Optional) Clean URL to remove ?filter=premium after use
+        window.history.replaceState({}, document.title, config.ROUTES.ASSESSMENTS);
     },
 
     renderAssessmentCard(assessment) {
@@ -232,7 +259,6 @@ const assessmentsPage = {
                             ${assessment.is_premium ? 'Premium' : 'Free'}
                         </span>
                     </div>
-                    <!-- ✅ Always go to instructions page -->
                     <button class="btn ${assessment.is_premium ? 'btn-accent' : 'btn-primary'} btn-full assessment-button" 
                             data-assessment-id="${assessment.id}">
                         View Details
@@ -243,10 +269,18 @@ const assessmentsPage = {
     },
 
     addEventListeners() {
-        const filterSelect = document.getElementById('filter-type');
-        const searchInput = document.getElementById('search-input');
+        // ✅ Toggle button listeners
+        document.querySelectorAll(".toggle-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                const filterValue = btn.getAttribute("data-value");
+                this.filterAssessments(filterValue);
+            });
+        });
 
-        filterSelect.addEventListener('change', this.filterAssessments.bind(this));
+        // ✅ Search input listener
+        const searchInput = document.getElementById('search-input');
         searchInput.addEventListener('input', utils.debounce(this.searchAssessments.bind(this), 300));
     },
 
@@ -261,22 +295,22 @@ const assessmentsPage = {
         }
     },
 
-    filterAssessments() {
-        const filterType = document.getElementById('filter-type').value;
+    filterAssessments(filterType) {
         const assessmentCards = document.querySelectorAll('.assessment-card');
 
         assessmentCards.forEach(card => {
             const isPremium = card.getAttribute('data-is-premium') === 'true';
-            
+            let show = false;
+
             if (filterType === 'all') {
-                card.style.display = 'block';
+                show = true;
             } else if (filterType === 'free' && !isPremium) {
-                card.style.display = 'block';
+                show = true;
             } else if (filterType === 'premium' && isPremium) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
+                show = true;
             }
+
+            card.style.display = show ? 'block' : 'none';
         });
     },
 
@@ -304,9 +338,7 @@ const assessmentsPage = {
                 e.stopPropagation();
                 
                 const assessmentId = button.getAttribute('data-assessment-id');
-                
                 console.log('Navigating to instructions for assessment:', assessmentId);
-                // ✅ Always go to instructions page
                 router.navigateTo(`/assessment/${assessmentId}/instructions`);
             });
         });

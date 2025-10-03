@@ -1,5 +1,6 @@
 const { query } = require('../config/database');
 
+
 class Assessment {
   static async create(assessmentData) {
     const { title, description, price, is_premium, created_by } = assessmentData;
@@ -13,6 +14,69 @@ class Assessment {
     
     return result.rows[0];
   }
+
+  static async getPurchasedByUser(userId) {
+    const sql = `
+      /* latest result per assessment for this user */
+      WITH latest AS (
+        SELECT DISTINCT ON (assessment_id)
+               assessment_id,
+               user_id,
+               score,
+               total_questions,
+               completed_at
+        FROM results
+        WHERE user_id = $1
+        ORDER BY assessment_id, completed_at DESC
+      )
+      SELECT 
+        a.id,
+        a.title,
+        a.description,
+        a.price,
+        a.is_premium,
+        ua.attempts_used,
+        ua.max_attempts,
+        ua.has_access,
+        ua.purchased_at,
+        l.completed_at                         AS last_attempt,
+        CASE 
+          WHEN l.total_questions > 0 
+          THEN ROUND((l.score::numeric / l.total_questions) * 100)
+          ELSE NULL
+        END                                    AS last_score_pct
+      FROM user_assessments ua
+      JOIN assessments a 
+        ON a.id = ua.assessment_id
+      LEFT JOIN latest l 
+        ON l.assessment_id = a.id
+       AND l.user_id = ua.user_id
+      WHERE ua.user_id = $1
+        AND a.is_premium = true
+      ORDER BY ua.purchased_at DESC;
+    `;
+
+    const { rows } = await query(sql, [userId]);
+
+    // enrich with derived fields for UI
+    return rows.map(r => ({
+      id: r.id,
+      title: r.title,
+      description: r.description,
+      price: r.price,
+      is_premium: r.is_premium,
+      attempts_used: r.attempts_used ?? 0,
+      max_attempts: r.max_attempts ?? 0,
+      has_access: r.has_access,
+      purchased_at: r.purchased_at,
+      last_attempt: r.last_attempt,                            // timestamp or null
+      last_score_pct: r.last_score_pct !== null ? Number(r.last_score_pct) : null,
+      passed: r.last_score_pct !== null ? Number(r.last_score_pct) >= 60 : false,
+      attempts_left: Math.max(0, (r.max_attempts ?? 0) - (r.attempts_used ?? 0)),
+      status: (r.attempts_used ?? 0) >= (r.max_attempts ?? 0) ? 'Expired' : 'Active'
+    }));
+  }
+  
 
   static async getQuestionsWithDifficulty(assessmentId, numQuestions) {
         try {

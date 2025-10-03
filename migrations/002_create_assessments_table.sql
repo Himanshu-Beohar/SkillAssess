@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS assessments (
     is_premium BOOLEAN DEFAULT FALSE,
     created_by INTEGER REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    num_questions INT DEFAULT 0,
+    time_limit INT DEFAULT 0;
 );
 
 -- Create index on created_by for faster queries

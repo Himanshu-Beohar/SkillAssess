@@ -4,11 +4,10 @@ const headerComponent = {
     async load() {
         const isAuthenticated = auth.isAuthenticated();
         const user = auth.getCurrentUser();
-        
         const headerHTML = `
             <div class="header-content">
                 <div class="logo">
-                    <a href="${config.ROUTES.HOME}" class="logo">
+                    <a href="${isAuthenticated ? '/wins' : config.ROUTES.HOME}" class="logo">
                     <img src="/assets/images/skillassess_logo.png" alt="SkillAssess Logo" class="badge-logo">
                     <span>SkillAssess</span>
                     </a>
@@ -21,7 +20,7 @@ const headerComponent = {
                 
                 <nav id="main-nav">
                     <ul>
-                        <li><a href="${config.ROUTES.HOME}" class="nav-link">Home</a></li>
+                        <li><a href="${isAuthenticated ? '/wins' : config.ROUTES.HOME}" class="nav-link wins-highlight">${isAuthenticated ? 'Wins' : 'Home'}</a></li>
                         <li><a href="${config.ROUTES.ASSESSMENTS}" class="nav-link">Assessments</a></li>
                         ${isAuthenticated ? `
                             <li><a href="${config.ROUTES.RESULTS}" class="nav-link">Results</a></li>
@@ -29,7 +28,7 @@ const headerComponent = {
                             <li>
                                 <div class="user-menu">
                                     <span class="user-greeting">Hello, ${user.name}</span>
-                                    <a href="/wins" class="nav-link wins-highlight">Wins</a>
+                                    
                                     <button class="btn btn-outline btn-sm logout-button">Logout</button>
                                 </div>
                             </li>

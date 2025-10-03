@@ -323,39 +323,199 @@ const authController = {
   },
 
   // Get profile
+  // async getProfile(req, res) {
+  //   try {
+  //     res.json({
+  //       success: true,
+  //       data: {
+  //         user: req.user
+  //       }
+  //     });
+  //   } catch (error) {
+  //     res.status(500).json({
+  //       success: false,
+  //       error: 'Failed to fetch profile'
+  //     });
+  //   }
+  // },
+
+
+  // async getProfile(req, res) {
+  //   try {
+  //     const userId = req.user.id;
+
+  //     // ✅ Fetch fresh data from the database (so it's always up-to-date)
+  //     const user = await User.findById(userId);
+
+  //     if (!user) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         error: "User not found"
+  //       });
+  //     }
+
+  //     // ✅ If 'skills' is stored as JSON string, parse it:
+  //     if (typeof user.skills === "string") {
+  //       try {
+  //         user.skills = JSON.parse(user.skills);
+  //       } catch (e) {
+  //         user.skills = [];
+  //       }
+  //     }
+
+  //     res.json({
+  //       success: true,
+  //       data: {
+  //         user: {
+  //           id: user.id,
+  //           name: user.name,
+  //           email: user.email,
+  //           gender: user.gender,
+  //           phone: user.phone,
+  //           dob: user.dob,
+  //           city: user.city,
+  //           country: user.country,
+  //           qualification: user.qualification,
+  //           college: user.college,
+  //           occupation: user.occupation,
+  //           experience: user.experience,
+  //           skills: user.skills || [],
+  //           goal: user.goal,
+  //           created_at: user.created_at,
+  //           updated_at: user.updated_at
+  //         }
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error("getProfile error:", error);
+  //     res.status(500).json({
+  //       success: false,
+  //       error: "Failed to fetch profile"
+  //     });
+  //   }
+  // },
+
   async getProfile(req, res) {
     try {
+      const userId = req.user.id; // user ID from token/session
+
+      // ✅ Always fetch fresh data from DB with TO_CHAR formatting
+      const user = await User.findById(userId);
+
+      // ✅ Make sure skills is parsed
+      if (typeof user.skills === "string") {
+        try {
+          user.skills = JSON.parse(user.skills);
+        } catch (e) {
+          user.skills = [];
+        }
+      }
+
       res.json({
         success: true,
         data: {
-          user: req.user
+          user
         }
       });
     } catch (error) {
+      console.error("getProfile error:", error);
       res.status(500).json({
         success: false,
-        error: 'Failed to fetch profile'
+        error: "Failed to fetch profile"
       });
     }
   },
 
-  // Update profile
+
+  // // Update profile
+  // async updateProfile(req, res) {
+  //   try {
+  //     const { name, email } = req.body;
+  //     const userId = req.user.id;
+
+  //     if (email && email !== req.user.email) {
+  //       const existingUser = await User.findByEmail(email);
+  //       if (existingUser && existingUser.id !== userId) {
+  //         return res.status(409).json({
+  //           success: false,
+  //           error: 'Email already taken'
+  //         });
+  //       }
+  //     }
+
+  //     const updatedUser = await User.updateProfile(userId, { name, email });
+
+  //     res.json({
+  //       success: true,
+  //       message: 'Profile updated successfully',
+  //       data: {
+  //         user: updatedUser
+  //       }
+  //     });
+  //   } catch (error) {
+  //     res.status(500).json({
+  //       success: false,
+  //       error: 'Failed to update profile'
+  //     });
+  //   }
+  // },
+
+
+  // ✅ Update profile controller - safe version
   async updateProfile(req, res) {
     try {
-      const { name, email } = req.body;
+      let {
+        name,
+        gender,
+        phone,
+        dob,
+        city,
+        country,
+        qualification,
+        college,
+        occupation,
+        experience,
+        skills,
+        goal
+      } = req.body;
+
       const userId = req.user.id;
 
-      if (email && email !== req.user.email) {
-        const existingUser = await User.findByEmail(email);
-        if (existingUser && existingUser.id !== userId) {
-          return res.status(409).json({
-            success: false,
-            error: 'Email already taken'
-          });
-        }
+      // 🛠️ Sanitize date: convert empty string to null
+      if (!dob || dob.trim() === "") {
+        dob = null;
       }
 
-      const updatedUser = await User.updateProfile(userId, { name, email });
+      // 🛠️ Sanitize skills: ensure it's always an array
+      if (typeof skills === "string") {
+        try {
+          skills = JSON.parse(skills);
+        } catch (e) {
+          skills = [];
+        }
+      }
+      if (!Array.isArray(skills)) {
+        skills = [];
+      }
+
+      // 🛠️ Build the update data object
+      const updateData = {
+        name,
+        gender,
+        phone,
+        dob, // ✅ Now always valid: either 'YYYY-MM-DD' or null
+        city,
+        country,
+        qualification,
+        college,
+        occupation,
+        experience,
+        skills, // ✅ Always an array
+        goal
+      };
+
+      // ✅ Call your model to update the user
+      const updatedUser = await User.updateProfile(userId, updateData);
 
       res.json({
         success: true,
@@ -365,6 +525,7 @@ const authController = {
         }
       });
     } catch (error) {
+      console.error("Profile update error:", error);
       res.status(500).json({
         success: false,
         error: 'Failed to update profile'
@@ -372,63 +533,118 @@ const authController = {
     }
   },
 
+
+
   // Change password
+  // async changePassword(req, res) {
+  //   try {
+  //     const { currentPassword, newPassword } = req.body;
+  //     const userId = req.user.id;
+
+  //     const user = await User.findById(userId);
+  //     if (!user) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         error: 'User not found'
+  //       });
+  //     }
+
+  //     const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  //     if (!isCurrentPasswordValid) {
+  //       return res.status(401).json({
+  //         success: false,
+  //         error: 'Current password is incorrect'
+  //       });
+  //     }
+
+  //     const saltRounds = 10;
+  //     const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+  //     await query(
+  //       'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2',
+  //       [hashedNewPassword, userId]
+  //     );
+
+  //     // ✅ Send confirmation email
+  //     try {
+  //       await emailService.sendEmail({
+  //         to: [user.email, process.env.SUPPORT_EMAIL],
+  //         subject: '🔒 Your password was changed',
+  //         html: `
+  //           <p>Hi ${user.name || ''},</p>
+  //           <p>This is a confirmation that your password was changed successfully on <strong>${new Date().toLocaleString()}</strong>.</p>
+  //           <p>If you didn’t make this change, please contact support immediately.</p>
+  //         `
+  //       });
+  //     } catch (err) {
+  //       console.error("⚠️ Failed to send password change email:", err);
+  //     }
+
+  //     res.json({
+  //       success: true,
+  //       message: 'Password changed successfully'
+  //     });
+  //   } catch (error) {
+  //     console.error('Error changing password:', error);
+  //     res.status(500).json({
+  //       success: false,
+  //       error: 'Failed to change password'
+  //     });
+  //   }
+  // },
+
   async changePassword(req, res) {
-    try {
-      const { currentPassword, newPassword } = req.body;
-      const userId = req.user.id;
-
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          error: 'User not found'
-        });
-      }
-
-      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
-      if (!isCurrentPasswordValid) {
-        return res.status(401).json({
-          success: false,
-          error: 'Current password is incorrect'
-        });
-      }
-
-      const saltRounds = 10;
-      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-
-      await query(
-        'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2',
-        [hashedNewPassword, userId]
-      );
-
-      // ✅ Send confirmation email
-      try {
-        await emailService.sendEmail({
-          to: [user.email, process.env.SUPPORT_EMAIL],
-          subject: '🔒 Your password was changed',
-          html: `
-            <p>Hi ${user.name || ''},</p>
-            <p>This is a confirmation that your password was changed successfully on <strong>${new Date().toLocaleString()}</strong>.</p>
-            <p>If you didn’t make this change, please contact support immediately.</p>
-          `
-        });
-      } catch (err) {
-        console.error("⚠️ Failed to send password change email:", err);
-      }
-
-      res.json({
-        success: true,
-        message: 'Password changed successfully'
-      });
-    } catch (error) {
-      console.error('Error changing password:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to change password'
-      });
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, error: 'Not authorized' });
     }
-  },
+
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // ✅ Fetch user from DB
+    const { rows } = await query('SELECT * FROM users WHERE id = $1', [userId]);
+    const user = rows[0];
+
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    // ✅ Check current password
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(401).json({ success: false, error: 'Current password is incorrect' });
+    }
+
+    // ✅ Hash new password
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // ✅ Update password
+    await query('UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2', [hashedNewPassword, userId]);
+
+    // ✅ Send confirmation email (optional)
+    try {
+      await emailService.sendEmail({
+        to: [user.email, process.env.SUPPORT_EMAIL],
+        subject: '🔒 Your password was changed',
+        html: `
+          <p>Hi ${user.name || ''},</p>
+          <p>This is a confirmation that your password was changed successfully on <strong>${new Date().toLocaleString()}</strong>.</p>
+          <p>If you didn’t make this change, please contact support immediately.</p>
+        `
+      });
+    } catch (err) {
+      console.error("⚠️ Failed to send password change email:", err);
+    }
+
+    return res.json({ success: true, message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('❌ Error changing password:', error);
+    return res.status(500).json({ success: false, error: error.message || 'Failed to change password' });
+  }
+},
+
 
   // Forgot password
   async forgotPassword(req, res) {

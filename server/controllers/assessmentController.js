@@ -3,9 +3,24 @@ const Question = require('../models/Question');
 const Payment = require('../models/Payment');
 const { query } = require('../config/database');
 const UserAssessment = require('../models/UserAssessment');
-const Result = require('../models/Result');
 
 const assessmentController = {
+
+  async getPurchasedAssessments(req, res) {
+    try {
+      const userId = req.user.id;
+      const purchased = await Assessment.getPurchasedByUser(userId);
+
+      res.json({
+        success: true,
+        data: purchased
+      });
+    } catch (err) {
+      console.error("Error fetching purchased assessments:", err);
+      res.status(500).json({ success: false, error: "Failed to load purchased assessments" });
+    }
+  },
+
   async createAssessment(req, res) {
     try {
       const { title, description, price, is_premium, questions } = req.body;
@@ -492,6 +507,7 @@ const assessmentController = {
       });
     }
   }
+  
 
 };
 

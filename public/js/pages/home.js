@@ -224,6 +224,14 @@
 const homePage = {
     async load() {
         const user = auth.getCurrentUser();
+
+        // Redirect authenticated users to dashboard---------------------------
+        if (user && window.location.pathname === config.ROUTES.HOME) {
+            router.navigateTo('/wins');
+            return;
+        }
+        //---------------------------
+
         const assessments = await this.loadFeaturedAssessments();
 
         const html = `
@@ -365,6 +373,7 @@ const homePage = {
         `;
 
         document.getElementById('page-content').innerHTML = html;
+        this.showProfileCompleteness();
 
         // Load recent results dynamically
         if (user) {
@@ -374,6 +383,35 @@ const homePage = {
         // ✅ Enable auto-scroll for featured assessments
         this.initAutoScroll();
     },
+
+    showProfileCompleteness() {
+        const user = auth.getCurrentUser();
+        if (!user) return;
+
+        const fields = [
+            user.gender, user.phone, user.dob, user.city, user.country,
+            user.qualification, user.college, user.occupation,
+            user.experience, (user.skills || []).length > 0, user.goal
+        ];
+
+        const total = fields.length;
+        const filled = fields.filter(Boolean).length;
+        const percent = Math.round((filled / total) * 100);
+
+        if (percent === 100) return;
+
+        const banner = `
+            <div class="profile-completeness-banner">
+            <h3>👤 Profile ${percent}% Complete</h3>
+            <p>You're ${total - filled} steps away from unlocking personalized insights and job-ready recommendations.</p>
+            <button onclick="router.navigateTo('${config.ROUTES.PROFILE}')" class="btn btn-accent">Complete Now</button>
+            </div>
+        `;
+
+        const container = document.querySelector(".page-container");
+        container.insertAdjacentHTML("afterbegin", banner);
+    },
+
 
     initAutoScroll() {
         const container = document.querySelector(".assessments-grid.home-scroll");

@@ -4,6 +4,9 @@ const assessmentController = require('../controllers/assessmentController');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const { validateAssessment } = require('../middleware/validation');
 
+// ✅ New route: Get all purchased premium assessments for logged-in user
+router.get("/purchased", authenticateToken, assessmentController.getPurchasedAssessments);
+
 // Public routes
 router.get('/', optionalAuth, assessmentController.getAllAssessments);
 router.get('/:id/start', authenticateToken, assessmentController.startAssessment);
@@ -19,6 +22,7 @@ router.get('/user/my-assessments', authenticateToken, assessmentController.getUs
 // Get instructions for a specific assessment (protected)
 //router.get('/:id/instructions', authenticateToken, assessmentController.getInstructions);
 router.get('/:id/instructions', authenticateToken, assessmentController.getAssessmentInstructions);
+
 
 
 module.exports = router;

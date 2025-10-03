@@ -77,7 +77,8 @@ async login(email, password) {
             }
             
             // Redirect to home page
-            router.navigateTo(config.ROUTES.HOME);
+            //router.navigateTo(config.ROUTES.HOME);
+            router.navigateTo('/wins');
             
             return response;
         } else {
@@ -141,7 +142,7 @@ async login(email, password) {
                 const currentUser = this.getCurrentUser();
                 const updatedUser = { ...currentUser, ...response.data.user };
                 localStorage.setItem(config.STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
-                utils.showNotification('Profile updated successfully!', 'success');
+                //utils.showNotification('Profile updated successfully!', 'success');
                 return response;
             } else {
                 throw new Error(response.error || 'Profile update failed');
@@ -164,7 +165,7 @@ async login(email, password) {
             });
             
             if (response.success) {
-                utils.showNotification('Password changed successfully!', 'success');
+                //utils.showNotification('Password changed successfully!', 'success');
                 return response;
             } else {
                 throw new Error(response.error || 'Password change failed');

@@ -1,0 +1,520 @@
+/* =========================
+   Ultra-Modern Dashboard Styles
+   ========================= */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.dashboard-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem;
+  color: var(--gray);
+}
+
+.header-actions .btn {
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.header-actions .btn:hover {
+  transform: scale(1.05);
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+.stat-icon {
+  font-size: 2.2rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+  transform: scale(1.2) rotate(5deg);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--dark);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--gray);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--light-gray);
+  margin-top: 0.8rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 0.6s ease-in-out;
+}
+
+/* Main Dashboard Layout */
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.dashboard-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 0.6s ease;
+}
+
+.dashboard-card:hover::before {
+  width: 100%;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+}
+
+.card-header h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.card-header i {
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+.card-content p {
+  color: var(--gray);
+  margin-bottom: 1rem;
+}
+
+.activity-list, .recommendations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.activity-item, .recommendation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9faff;
+  padding: 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.activity-item:hover, .recommendation-item:hover {
+  background: #eef2ff;
+  transform: translateX(5px);
+}
+
+.activity-icon, .recommendation-icon {
+  font-size: 1.8rem;
+  color: var(--primary);
+}
+
+.activity-status, .recommendation-meta {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gray);
+}
+
+/* Quick Actions */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1rem;
+}
+
+.quick-action-btn {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 1.2rem 1rem;
+  border: none;
+  border-radius: 16px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.quick-action-btn i {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.quick-action-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+}
+
+/* Responsive Layout */
+@media (max-width: 1024px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .stat-card {
+    padding: 1.5rem;
+  }
+
+  .quick-action-btn {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .dashboard-header {
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+/* =========================
+   Ultra Modern Sidebar Dashboard
+   ========================= */
+
+/* ====== Layout Container ====== */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  background: #f5f7fb;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .dashboard-layout {
+    grid-template-columns: 0 1fr;
+  }
+}
+
+/* ====== Sidebar ====== */
+.dashboard-sidebar {
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  z-index: 200;
+}
+
+.sidebar-logo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+
+.sidebar-menu {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0;
+}
+
+.sidebar-menu li {
+  width: 100%;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  opacity: 0.9;
+}
+
+.sidebar-link i {
+  font-size: 1.4rem;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(5px);
+  opacity: 1;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* ====== Sidebar Toggle (Mobile) ====== */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 300;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background: var(--secondary);
+}
+
+@media (max-width: 900px) {
+  .dashboard-sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    height: 100%;
+    transition: all 0.4s ease;
+  }
+  .dashboard-sidebar.open {
+    left: 0;
+  }
+  .sidebar-toggle {
+    display: block;
+  }
+}
+
+/* ====== Main Content ====== */
+.dashboard-main {
+  padding: 2rem 3rem;
+  background: #f5f7fb;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .dashboard-main {
+    padding: 1.5rem;
+  }
+}
+
+/* ====== Section Styling ====== */
+.dashboard-section {
+  margin-bottom: 3rem;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-section h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin-bottom: 1.5rem;
+  border-left: 4px solid var(--primary);
+  padding-left: 1rem;
+}
+
+/* ====== Cards and Content ====== */
+.section-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.section-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.section-card h3 {
+  font-size: 1.4rem;
+  color: var(--dark);
+  margin-bottom: 1rem;
+}
+
+.section-card p {
+  color: var(--gray);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ====== Responsive Grids ====== */
+.stats-grid,
+.activity-list,
+.recommendations-list,
+.quick-actions-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.quick-actions-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.quick-action-btn {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: #fff;
+  padding: 1.2rem;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.quick-action-btn i {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.quick-action-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+}
+
+/* ====== Smooth Section Reveal ====== */
+.dashboard-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.7s ease;
+}
+
+.dashboard-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+html {
+  scroll-behavior: smooth;
+}

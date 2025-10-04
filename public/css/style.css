@@ -6709,4 +6709,425 @@ nav ul {
 }
 
 
+/*Responsive mobile*/
+/* 📱 Mobile Optimization */
+@media (max-width: 768px) {
+
+  /* Give each card more breathing room */
+  .premium-assessments-card,
+  .level-progress-card,
+  .recommended-card,
+  .recent-activity-card,
+  .quick-actions-card,
+  .skill-insight-card {
+    border-radius: 16px;
+    padding: 16px;
+    margin: 16px auto;
+    width: 92%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  /* Reduce font sizes slightly */
+  h3, h4, h5 {
+    font-size: 1rem;
+  }
+
+  p, span, .premium-details span, .premium-title {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  /* Space between sections */
+  section, .dashboard-section {
+    margin-bottom: 20px;
+  }
+
+  /* Better spacing between cards */
+  .premium-assessment-item {
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+  }
+
+  /* Tabs - more compact and rounded */
+  .premium-tabs {
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .premium-tab {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+  }
+
+  /* Buttons - smaller & consistent */
+  .btn, .premium-assessment-item button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+  }
+
+  /* Card header spacing */
+  .card-header h3 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  /* Keep scrollable sections inside fixed height */
+  .premium-tab-content {
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  /* Quick actions - stacked nicely */
+  .quick-actions-card .action-item {
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+  }
+
+  /* Improve spacing between main dashboard cards */
+  .dashboard-section > div {
+    margin-bottom: 22px;
+  }
+
+  /* Optional: reduce top margin of main container */
+  .dashboard-container {
+    padding-top: 12px;
+  }
+}
+
+/* 📱 Fix Recent Activity layout only on mobile */
+@media (max-width: 480px) {
+
+  /* Card container */
+  .recent-activity-card {
+    padding: 16px;
+    margin: 16px auto;
+    border-radius: 16px;
+    width: 92%;
+  }
+
+  /* List spacing */
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  /* Individual activity items */
+  .activity-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 10px 14px;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+  }
+
+  .activity-item:hover {
+    background: #eef2ff;
+  }
+
+  /* Left side: icon + details */
+  .activity-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+  }
+
+  .activity-icon.success {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .activity-icon.failed {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .activity-details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .activity-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .activity-date {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  /* Right side: score + badge */
+  .activity-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .activity-score {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .activity-score.success {
+    color: #16a34a;
+  }
+
+  .activity-score.failed {
+    color: #dc2626;
+  }
+
+  .activity-badge {
+    font-size: 0.7rem;
+    background: linear-gradient(to right, #6366f1, #a855f7);
+    color: #fff;
+    padding: 3px 6px;
+    border-radius: 10px;
+  }
+}
+
+/* 📱 Global Mobile Card Optimization */
+@media (max-width: 480px) {
+
+  /* Make all dashboard sections/cards use nearly full width */
+  .premium-assessments-card,
+  .level-progress-card,
+  .recent-activity-card,
+  .recommended-card,
+  .skill-insight-card,
+  .quick-actions-card,
+  .dashboard-card,
+  .premium-tab-content,
+  .activity-list,
+  .recommended-section,
+  .in-progress-section {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin: 0 auto 20px auto !important;
+    border-radius: 16px;
+    padding: 16px !important;
+    box-sizing: border-box;
+  }
+
+  /* Ensure inner elements don’t shrink */
+  .premium-assessment-item,
+  .activity-item,
+  .recommended-item,
+  .insight-card,
+  .quick-action-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 8px 0;
+  }
+
+  /* Header and title alignment */
+  .card-header h3,
+  .section-title {
+    font-size: 1rem;
+    text-align: left;
+  }
+
+  /* Buttons & tabs slightly smaller */
+  .btn,
+  .premium-assessment-item button,
+  .premium-tab {
+    width: auto;
+    min-width: 90px;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+
+  /* Improve spacing between sections */
+  section, .dashboard-section, .dashboard-card {
+    margin-bottom: 22px !important;
+  }
+
+  /* Remove unnecessary side margins or paddings on container */
+  .dashboard-container,
+  main,
+  .main-content {
+    padding: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* 🛠️ Fix horizontal scroll for activity section */
+  .recent-activity-card,
+  .activity-list,
+  .activity-item {
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box;
+  }
+
+  /* Activity list */
+  .activity-list {
+    padding: 0 8px;
+    margin: 0;
+    overflow-x: hidden !important;
+  }
+
+  /* Fix individual activity card layout */
+  .activity-item {
+    display: flex;
+    flex-direction: column;     /* ✅ Stack everything vertically on mobile */
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 12px;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    box-sizing: border-box;
+    overflow-x: hidden !important;
+  }
+
+  /* Icon positioning */
+  .activity-icon {
+    align-self: flex-start;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+
+  /* Stack title and date nicely */
+  .activity-info {
+    width: 100%;
+    word-break: break-word;
+  }
+
+  .activity-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .activity-date {
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+
+  /* Score and badge side by side */
+  .activity-meta {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 4px;
+    font-size: 0.85rem;
+  }
+
+  .activity-score {
+    font-weight: 600;
+  }
+
+  .activity-type {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* Container for tabs */
+  .premium-tabs,
+  .premium-assessments-card .tab-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+    flex-wrap: nowrap; /* ✅ Prevent them from wrapping into 2 lines */
+    margin-bottom: 14px;
+  }
+
+  /* Each tab button */
+  .premium-tab,
+  .premium-assessments-card .tab {
+    flex: 1; /* ✅ Make each tab share equal width */
+    text-align: center;
+    white-space: nowrap; /* ✅ Prevent text from breaking */
+    font-size: 0.85rem;
+    padding: 8px 0;
+    border-radius: 10px;
+    min-width: 0;
+  }
+
+  /* Optional: reduce padding globally to save width */
+  .premium-tab.active {
+    font-weight: 600;
+  }
+}
+
+/* 🛠️ Recommended Section - Prevent horizontal scroll */
+.recommendations-card {
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Make sure the list never exceeds the parent */
+.recommendations-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* Recommended item styling (if flex/grid is used) */
+.recommendations-list > * {
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Optional: if using horizontal cards */
+.recommendations-list::-webkit-scrollbar {
+  display: none; /* hide scrollbar if accidentally added */
+}
+
+/* Fix for any rogue element */
+.recommendations-card * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+
 

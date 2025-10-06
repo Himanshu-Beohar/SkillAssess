@@ -7129,5 +7129,29 @@ nav ul {
   box-sizing: border-box;
 }
 
+/*Assessments page filter*/
+
+.advanced-filters {
+  display: flex;
+  gap: 1rem;
+  margin: 1.2rem 0;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
 
 

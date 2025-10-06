@@ -10,6 +10,13 @@ CREATE TABLE IF NOT EXISTS assessments (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     num_questions INT DEFAULT 0,
     time_limit INT DEFAULT 0;
+    skill VARCHAR(100),
+    sub_skill VARCHAR(100),
+    category VARCHAR(100),
+    difficulty VARCHAR(50) CHECK (difficulty IN ('Beginner', 'Intermediate', 'Advanced', 'Expert')),
+    tags JSONB DEFAULT '[]',
+    trending BOOLEAN DEFAULT FALSE,
+    job_role VARCHAR(150);
 );
 
 -- Create index on created_by for faster queries
@@ -26,3 +33,25 @@ ON CONFLICT DO NOTHING;
 ALTER TABLE assessments 
   ADD COLUMN num_questions INT DEFAULT 0,
   ADD COLUMN time_limit INT DEFAULT 0;
+
+    ALTER TABLE assessments
+-- 🔑 Primary skill (e.g., JavaScript, Python, SQL)
+ADD COLUMN skill VARCHAR(100),
+
+-- 📚 Sub-skill or specialization (e.g., React, Pandas, Docker)
+ADD COLUMN sub_skill VARCHAR(100),
+
+-- 🗂️ Category of assessment (e.g., Frontend, Backend, Data Science, DevOps)
+ADD COLUMN category VARCHAR(100),
+
+-- 📊 Difficulty level (Beginner, Intermediate, Advanced, Expert)
+ADD COLUMN difficulty VARCHAR(50) CHECK (difficulty IN ('Beginner', 'Intermediate', 'Advanced', 'Expert')),
+
+-- 🏷️ Tags for search, recommendations, filters (stored as JSON array)
+ADD COLUMN tags JSONB DEFAULT '[]',
+
+-- 📈 Trending flag — whether this assessment is currently trending
+ADD COLUMN trending BOOLEAN DEFAULT FALSE,
+
+-- 💼 Primary job roles relevant to this assessment (e.g., "Frontend Developer", "Data Scientist")
+ADD COLUMN job_role VARCHAR(150);

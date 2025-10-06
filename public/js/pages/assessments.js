@@ -5,13 +5,13 @@ const assessmentsPage = {
     const urlParams = new URLSearchParams(window.location.search);
     const preselectedFilter = urlParams.get("filter") || "all";
     const skillFilter = urlParams.get("skill");
-    const searchQuery = urlParams.get("search"); // ✅ declare once here
+    const searchQuery = urlParams.get("search");
 
     // ✅ 2. Load assessments
     const assessments = await this.loadAssessments();
     let filteredAssessments = assessments;
 
-    // ✅ 3. Apply skill filter if present
+    // ✅ 3. Apply skill filter (server-side param)
     if (skillFilter) {
       filteredAssessments = assessments.filter(a =>
         a.skill && a.skill.toLowerCase() === skillFilter.toLowerCase()
@@ -19,7 +19,10 @@ const assessmentsPage = {
       document.title = `${skillFilter} Assessments | SkillAssess`;
     }
 
-    // ✅ 4. Render page
+    // ✅ 4. Generate category options dynamically
+    const categories = [...new Set(assessments.map(a => a.category).filter(Boolean))];
+
+    // ✅ 5. Render page
     const html = `
       <div class="page-container">
         <div class="page-header">
@@ -38,6 +41,7 @@ const assessmentsPage = {
           </div>
         ` : ''}
 
+        <!-- Toggle + Search -->
         <div class="filter-toolbar">
           <div class="filter-group toggle-group">
             <button class="toggle-btn" data-value="all">All</button>
@@ -45,7 +49,6 @@ const assessmentsPage = {
             <button class="toggle-btn" data-value="premium">Premium</button>
           </div>
 
-          <!-- Search bar -->
           <div class="search-group">
             <div class="search-wrapper">
               <input 
@@ -54,11 +57,27 @@ const assessmentsPage = {
                 class="search-input" 
                 placeholder="🔍 Search assessments..."
               />
-              <button class="search-btn" onclick="assessmentsPage.searchAssessments()">
+              <button class="search-btn" onclick="assessmentsPage.applyAdvancedFilters()">
                 <i class="fas fa-search"></i>
               </button>
             </div>
           </div>
+        </div>
+
+        <!-- 🧩 Category & Difficulty Filters -->
+        <div class="advanced-filters">
+          <select id="category-filter" class="filter-select">
+            <option value="">All Categories</option>
+            ${categories.map(c => `<option value="${c}">${c}</option>`).join("")}
+          </select>
+
+          <select id="difficulty-filter" class="filter-select">
+            <option value="">All Difficulty</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+            <option value="Expert">Expert</option>
+          </select>
         </div>
 
         <div class="assessments-grid" id="assessments-container">
@@ -77,33 +96,30 @@ const assessmentsPage = {
 
     document.getElementById('page-content').innerHTML = html;
 
-    // ✅ 5. Auto-run search if ?search param is present
-    // ✅ 5. Auto-run search if ?search param is present
+    // ✅ 6. Pre-fill search from URL if needed
     if (searchQuery) {
-    const inputEl = document.getElementById("search-input");
-    if (inputEl) {
+      const inputEl = document.getElementById("search-input");
+      if (inputEl) {
         inputEl.value = searchQuery;
-        // 🔁 Small delay ensures DOM is ready before filtering
         setTimeout(() => {
-        this.searchAssessments();
+          this.applyAdvancedFilters();
         }, 100);
-    }
+      }
     }
 
-
-    // ✅ 6. Add listeners
+    // ✅ 7. Add listeners
     this.addEventListeners();
     this.addAssessmentButtonListeners();
 
-    // ✅ 7. Activate toggle button
+    // ✅ 8. Activate toggle button & filter initially
     const defaultBtn = document.querySelector(`.toggle-btn[data-value="${preselectedFilter}"]`);
     if (defaultBtn) {
       document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
       defaultBtn.classList.add("active");
-      this.filterAssessments(preselectedFilter);
     }
+    this.applyAdvancedFilters();
 
-    // ✅ 8. Clean URL
+    // ✅ 9. Clean URL
     window.history.replaceState({}, document.title, config.ROUTES.ASSESSMENTS);
   },
 
@@ -112,7 +128,9 @@ const assessmentsPage = {
       <div class="assessment-card" 
            data-assessment-id="${assessment.id}" 
            data-is-premium="${assessment.is_premium}" 
-           data-skill="${assessment.skill || ''}">
+           data-skill="${assessment.skill || ''}"
+           data-category="${assessment.category || ''}"
+           data-difficulty="${assessment.difficulty || ''}">
         <div class="assessment-image">
           <i class="fas ${assessment.is_premium ? 'fa-crown' : 'fa-book'}"></i>
         </div>
@@ -137,16 +155,26 @@ const assessmentsPage = {
   },
 
   addEventListeners() {
+    // ✅ Toggle Free/Premium
     document.querySelectorAll(".toggle-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
-        this.filterAssessments(btn.getAttribute("data-value"));
+        this.applyAdvancedFilters();
       });
     });
 
+    // ✅ Search
     const searchInput = document.getElementById('search-input');
-    searchInput.addEventListener('input', utils.debounce(this.searchAssessments.bind(this), 300));
+    if (searchInput) {
+      searchInput.addEventListener('input', utils.debounce(this.applyAdvancedFilters.bind(this), 300));
+    }
+
+    // ✅ Category & Difficulty
+    const categorySelect = document.getElementById("category-filter");
+    const difficultySelect = document.getElementById("difficulty-filter");
+    if (categorySelect) categorySelect.addEventListener("change", this.applyAdvancedFilters.bind(this));
+    if (difficultySelect) difficultySelect.addEventListener("change", this.applyAdvancedFilters.bind(this));
   },
 
   async loadAssessments() {
@@ -160,48 +188,51 @@ const assessmentsPage = {
     }
   },
 
-  filterAssessments(filterType) {
-    const skillFilter = new URLSearchParams(window.location.search).get("skill");
-    const assessmentCards = document.querySelectorAll('.assessment-card');
-
-    assessmentCards.forEach(card => {
-      const isPremium = card.getAttribute('data-is-premium') === 'true';
-      let show = true;
-
-      if (skillFilter) {
-        const cardSkill = card.getAttribute('data-skill');
-        if (!cardSkill || cardSkill.toLowerCase() !== skillFilter.toLowerCase()) {
-          show = false;
-        }
-      }
-
-      if (filterType === 'free' && isPremium) show = false;
-      if (filterType === 'premium' && !isPremium) show = false;
-
-      card.style.display = show ? 'block' : 'none';
-    });
-  },
-
-  searchAssessments() {
+  applyAdvancedFilters() {
+    const category = document.getElementById("category-filter")?.value || "";
+    const difficulty = document.getElementById("difficulty-filter")?.value || "";
+    const searchTerm = document.getElementById("search-input")?.value.toLowerCase() || "";
     const urlParams = new URLSearchParams(window.location.search);
     const skillFilter = urlParams.get("skill");
-    const searchInput = document.getElementById('search-input');
-    const searchTerm = searchInput.value.toLowerCase();
-    const assessmentCards = document.querySelectorAll('.assessment-card');
+    const activeToggle = document.querySelector(".toggle-btn.active")?.getAttribute("data-value") || "all";
 
-    assessmentCards.forEach(card => {
-      const title = card.querySelector('h3').textContent.toLowerCase();
-      const description = card.querySelector('p').textContent.toLowerCase();
-      let show = title.includes(searchTerm) || description.includes(searchTerm);
+    const cards = document.querySelectorAll(".assessment-card");
 
-      if (skillFilter) {
-        const cardSkill = card.getAttribute('data-skill');
-        if (!cardSkill || cardSkill.toLowerCase() !== skillFilter.toLowerCase()) {
-          show = false;
-        }
+    cards.forEach(card => {
+      const title = card.querySelector("h3").textContent.toLowerCase();
+      const description = card.querySelector("p").textContent.toLowerCase();
+      const cardCategory = card.getAttribute("data-category") || "";
+      const cardDifficulty = card.getAttribute("data-difficulty") || "";
+      const cardSkill = card.getAttribute("data-skill") || "";
+      const isPremium = card.getAttribute("data-is-premium") === "true";
+
+      let show = true;
+
+      // 🔍 Search filter
+      if (searchTerm && !(title.includes(searchTerm) || description.includes(searchTerm))) {
+        show = false;
       }
 
-      card.style.display = show ? 'block' : 'none';
+      // 🎯 Skill filter
+      if (skillFilter && cardSkill.toLowerCase() !== skillFilter.toLowerCase()) {
+        show = false;
+      }
+
+      // 📁 Category filter
+      if (category && cardCategory !== category) {
+        show = false;
+      }
+
+      // 📊 Difficulty filter
+      if (difficulty && cardDifficulty !== difficulty) {
+        show = false;
+      }
+
+      // 💰 Free/Premium filter
+      if (activeToggle === "free" && isPremium) show = false;
+      if (activeToggle === "premium" && !isPremium) show = false;
+
+      card.style.display = show ? "block" : "none";
     });
   },
 
@@ -217,3 +248,4 @@ const assessmentsPage = {
     });
   }
 };
+

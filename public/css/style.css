@@ -7153,5 +7153,117 @@ nav ul {
   border-color: #007bff;
 }
 
+/*-------------------------------------*/
+/* Make every card equal height */
+.assessment-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* Content wrapper takes full height */
+.assessment-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+  padding-bottom: 1rem;
+}
+
+/* Title spacing */
+.assessment-content h3 {
+  min-height: 50px; /* ensures 2 lines space */
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+/* Description spacing */
+.assessment-content p {
+  min-height: 80px;  /* forces consistent card height */
+  max-height: 80px;  /* truncates long text */
+  overflow: hidden;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+/* Price & tag row stays fixed size */
+.assessment-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+  margin-bottom: 1rem;
+}
+
+/* 🧩 Button always sticks to bottom */
+.assessment-button {
+  margin-top: auto;
+  display: block;
+  width: 100%;
+}
+
+/*------------------------------------------------------*/
+/* 🔥 Trending Badge */
+/* 🔥 Trending Badge */
+/* The card just needs to be positioned */
+/* ▶ Variant: put the badge on the RIGHT if ever needed */
 
 
+/* Slightly smaller on narrow screens */
+@media (max-width: 560px){
+  .trending-badge{ font-size:.75rem; padding:5px 10px; }
+}
+
+/* Card container */
+.assessment-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 🔥 Trending Badge */
+.trending-badge { position: absolute; top: 12px; left: -12px; background: linear-gradient(135deg, #ff5722, #ff9800); color: #fff; padding: 6px 14px; font-size: 0.85rem; font-weight: 600; border-radius: 0 8px 8px 0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); transform: rotate(-3deg); z-index: 5; }
+
+/* Optional icon styling */
+
+
+/* ✅ Subtle folded curl (refined version) */
+
+
+/* Hover effect (optional – looks premium) */
+.trending-badge:hover {
+  transform: rotate(0deg) scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s ease;
+}
+
+/*------------------------------------------------------------*/
+/* 📊 Assessment Info Section */
+.assessment-info {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0 16px;
+  background: #f9f9fc;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.info-item i {
+  color: #6366f1;
+  font-size: 0.9rem;
+}
+
+/* 🎯 Difficulty colors */
+.difficulty-beginner span { color: #4caf50; }
+.difficulty-intermediate span { color: #ff9800; }
+.difficulty-advanced span { color: #e53935; }
+.difficulty-expert span { color: #9c27b0; }

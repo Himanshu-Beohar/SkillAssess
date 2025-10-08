@@ -366,12 +366,110 @@ const UserAnswer = require('../models/UserAnswer');
 const emailService = require('../utils/emailService'); // ✅ added
 
 const resultController = {
+  // async submitAssessment(req, res) {
+  //   try {
+  //     const { assessment_id, answers, time_taken } = req.body;
+  //     const userId = req.user.id;
+
+  //     // Get the assessment to check total questions
+  //     const assessment = await Assessment.findById(assessment_id);
+  //     if (!assessment) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         error: 'Assessment not found'
+  //       });
+  //     }
+
+  //     // Calculate score based on the questions that were actually presented
+  //     let score = 0;
+  //     const results = [];
+  //     const questionIds = answers.map(a => a.question_id);
+
+  //     const shownQuestions = await Question.findByIds(questionIds);
+
+  //     answers.forEach(answer => {
+  //       const question = shownQuestions.find(q => q.id === answer.question_id);
+  //       if (question) {
+  //         const isCorrect = question.correct_answer === answer.selected_answer;
+  //         if (isCorrect) score++;
+
+  //         results.push({
+  //           question_id: question.id,
+  //           question_text: question.question_text,
+  //           selected_answer: answer.selected_answer,
+  //           correct_answer: question.correct_answer,
+  //           is_correct: isCorrect,
+  //           options: typeof question.options === 'string'
+  //             ? JSON.parse(question.options)
+  //             : question.options
+  //         });
+  //       }
+  //     });
+
+  //     const total_questions = answers.length;
+
+  //     // Save result
+  //     const resultData = {
+  //       user_id: userId,
+  //       assessment_id,
+  //       score,
+  //       total_questions,
+  //       time_taken: time_taken || 0
+  //     };
+
+  //     const result = await Result.create(resultData);
+
+  //     // Save individual answers
+  //     await Promise.all(results.map(async (resultDetail) => {
+  //       await UserAnswer.create({
+  //         result_id: result.id,
+  //         question_id: resultDetail.question_id,
+  //         selected_answer: resultDetail.selected_answer,
+  //         is_correct: resultDetail.is_correct
+  //       });
+  //     }));
+
+  //     // ✅ Send email with results
+  //     try {
+  //       const user = req.user; // from authenticateToken
+  //       await emailService.sendAssessmentResult(user, assessment, {
+  //         score,
+  //         total: total_questions
+  //       });
+  //     } catch (emailErr) {
+  //       console.error("⚠️ Failed to send assessment result email:", emailErr);
+  //     }
+
+  //     res.json({
+  //       success: true,
+  //       message: 'Assessment submitted successfully',
+  //       data: {
+  //         result: {
+  //           id: result.id,
+  //           score,
+  //           total_questions,
+  //           percentage: Math.round((score / total_questions) * 100),
+  //           time_taken: result.time_taken,
+  //           completed_at: result.completed_at
+  //         },
+  //         detailed_results: results
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error('Assessment submission error:', error);
+  //     res.status(500).json({
+  //       success: false,
+  //       error: 'Failed to submit assessment'
+  //     });
+  //   }
+  // },
+
   async submitAssessment(req, res) {
     try {
       const { assessment_id, answers, time_taken } = req.body;
       const userId = req.user.id;
 
-      // Get the assessment to check total questions
+      // 🔹 1. Fetch assessment
       const assessment = await Assessment.findById(assessment_id);
       if (!assessment) {
         return res.status(404).json({
@@ -380,11 +478,10 @@ const resultController = {
         });
       }
 
-      // Calculate score based on the questions that were actually presented
+      // 🔹 2. Score calculation
       let score = 0;
       const results = [];
       const questionIds = answers.map(a => a.question_id);
-
       const shownQuestions = await Question.findByIds(questionIds);
 
       answers.forEach(answer => {
@@ -408,38 +505,65 @@ const resultController = {
 
       const total_questions = answers.length;
 
-      // Save result
+      // 🔹 3. New fields calculation
+      const percentage = Math.round((score / total_questions) * 100);
+      const status = percentage >= 60 ? 'pass' : 'fail';
+
+      // Count previous attempts for this user-assessment
+      const previousAttempts = await Result.countByUserAndAssessment(userId, assessment_id);
+      const attempt_number = previousAttempts + 1;
+
+      // Generate simple feedback
+      const feedback = status === 'pass'
+        ? 'Great job! You passed this assessment. Keep learning and aim higher!'
+        : 'You didn’t pass this time. Review the questions and try again soon.';
+
+      // Optional: Placeholder for certificate URL
+      const certificate_url = status === 'pass'
+        ? `/certificates/${userId}_${assessment_id}_${Date.now()}.pdf`
+        : null;
+
+      // 🔹 4. Prepare data for DB
       const resultData = {
         user_id: userId,
         assessment_id,
         score,
         total_questions,
-        time_taken: time_taken || 0
+        time_taken: time_taken || 0,
+        status,
+        percentage,
+        attempt_number,
+        certificate_url,
+        feedback
       };
 
+      // 🔹 5. Save to DB
       const result = await Result.create(resultData);
 
-      // Save individual answers
-      await Promise.all(results.map(async (resultDetail) => {
+      // 🔹 6. Save each user answer
+      await Promise.all(results.map(async (r) => {
         await UserAnswer.create({
           result_id: result.id,
-          question_id: resultDetail.question_id,
-          selected_answer: resultDetail.selected_answer,
-          is_correct: resultDetail.is_correct
+          question_id: r.question_id,
+          selected_answer: r.selected_answer,
+          is_correct: r.is_correct
         });
       }));
 
-      // ✅ Send email with results
+      // 🔹 7. (Optional) Send result email
       try {
-        const user = req.user; // from authenticateToken
+        const user = req.user;
         await emailService.sendAssessmentResult(user, assessment, {
           score,
-          total: total_questions
+          total: total_questions,
+          percentage,
+          status
         });
       } catch (emailErr) {
         console.error("⚠️ Failed to send assessment result email:", emailErr);
       }
 
+      // 🔹 8. Respond to client
       res.json({
         success: true,
         message: 'Assessment submitted successfully',
@@ -448,21 +572,27 @@ const resultController = {
             id: result.id,
             score,
             total_questions,
-            percentage: Math.round((score / total_questions) * 100),
+            percentage,
+            status,
+            attempt_number,
+            feedback,
+            certificate_url,
             time_taken: result.time_taken,
             completed_at: result.completed_at
           },
           detailed_results: results
         }
       });
+
     } catch (error) {
-      console.error('Assessment submission error:', error);
+      console.error('❌ Assessment submission error:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to submit assessment'
       });
     }
   },
+
 
   async getUserResults(req, res) {
     try {

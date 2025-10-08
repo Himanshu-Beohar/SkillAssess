@@ -319,6 +319,12 @@ const assessmentsPage = {
 
         <!-- 🧩 Category, Difficulty & Job Role Filters -->
         <div class="advanced-filters">
+
+          <select id="jobrole-filter" class="filter-select">
+            <option value="">All Job Roles</option>
+            ${jobRoles.map(j => `<option value="${j}">${j}</option>`).join("")}
+          </select>
+
           <select id="category-filter" class="filter-select">
             <option value="">All Categories</option>
             ${categories.map(c => `<option value="${c}">${c}</option>`).join("")}
@@ -332,10 +338,7 @@ const assessmentsPage = {
             <option value="Expert">Expert</option>
           </select>
 
-          <select id="jobrole-filter" class="filter-select">
-            <option value="">All Job Roles</option>
-            ${jobRoles.map(j => `<option value="${j}">${j}</option>`).join("")}
-          </select>
+          
         </div>
 
         <div class="assessments-grid" id="assessments-container">
@@ -381,123 +384,6 @@ const assessmentsPage = {
     window.history.replaceState({}, document.title, config.ROUTES.ASSESSMENTS);
   },
 
-  // renderAssessmentCard(assessment) {
-  //   return `
-  //     <div class="assessment-card" 
-  //          data-assessment-id="${assessment.id}" 
-  //          data-is-premium="${assessment.is_premium}" 
-  //          data-skill="${assessment.skill || ''}"
-  //          data-category="${assessment.category || ''}"
-  //          data-difficulty="${assessment.difficulty || ''}"
-  //          data-job-role="${assessment.job_role || ''}">
-  //       <div class="assessment-image">
-  //         <i class="fas ${assessment.is_premium ? 'fa-crown' : 'fa-book'}"></i>
-  //       </div>
-  //       <div class="assessment-content">
-  //         <h3>${assessment.title}</h3>
-  //         <p>${assessment.description || 'Test your knowledge and skills'}</p>
-  //         <div class="assessment-meta">
-  //           <span class="price ${assessment.is_premium ? 'paid' : 'free'}">
-  //             ${assessment.is_premium ? utils.formatCurrency(assessment.price) : 'Free'}
-  //           </span>
-  //           <span class="tag ${assessment.is_premium ? 'tag-paid' : 'tag-free'}">
-  //             ${assessment.is_premium ? 'Premium' : 'Free'}
-  //           </span>
-  //         </div>
-  //         <button class="btn ${assessment.is_premium ? 'btn-accent' : 'btn-primary'} btn-full assessment-button" 
-  //                 data-assessment-id="${assessment.id}">
-  //           View Details
-  //         </button>
-  //       </div>
-  //     </div>
-  //   `;
-  // },
-
-  // renderAssessmentCard(assessment) {
-  //   // ✅ Truncate description to 220 chars with "..."
-  //   let description = assessment.description || 'Test your knowledge and skills';
-  //   if (description.length > 220) {
-  //     description = description.substring(0, 220).trim() + '...';
-  //   }
-
-  //   return `
-  //     <div class="assessment-card" 
-  //         data-assessment-id="${assessment.id}" 
-  //         data-is-premium="${assessment.is_premium}" 
-  //         data-skill="${assessment.skill || ''}"
-  //         data-category="${assessment.category || ''}"
-  //         data-difficulty="${assessment.difficulty || ''}"
-  //         data-job-role="${assessment.job_role || ''}">
-  //       <div class="assessment-image">
-  //         <i class="fas ${assessment.is_premium ? 'fa-crown' : 'fa-book'}"></i>
-  //       </div>
-  //       <div class="assessment-content">
-  //         <h3>${assessment.title}</h3>
-  //         <p>${description}</p>
-  //         <div class="assessment-meta">
-  //           <span class="price ${assessment.is_premium ? 'paid' : 'free'}">
-  //             ${assessment.is_premium ? utils.formatCurrency(assessment.price) : 'Free'}
-  //           </span>
-  //           <span class="tag ${assessment.is_premium ? 'tag-paid' : 'tag-free'}">
-  //             ${assessment.is_premium ? 'Premium' : 'Free'}
-  //           </span>
-  //         </div>
-  //         <button class="btn ${assessment.is_premium ? 'btn-accent' : 'btn-primary'} btn-full assessment-button" 
-  //                 data-assessment-id="${assessment.id}">
-  //           View Details
-  //         </button>
-  //       </div>
-  //     </div>
-  //   `;
-  // },
-
-  // renderAssessmentCard(assessment) {
-  //   // ✅ Truncate description
-  //   let description = assessment.description || 'Test your knowledge and skills';
-  //   if (description.length > 220) {
-  //     description = description.substring(0, 220).trim() + '...';
-  //   }
-
-  //   return `
-  //     <div class="assessment-card" 
-  //         data-assessment-id="${assessment.id}" 
-  //         data-is-premium="${assessment.is_premium}" 
-  //         data-skill="${assessment.skill || ''}"
-  //         data-category="${assessment.category || ''}"
-  //         data-difficulty="${assessment.difficulty || ''}"
-  //         data-job-role="${assessment.job_role || ''}">
-        
-  //       <!-- 🔥 Trending Badge -->
-  //       ${assessment.trending ? `
-  //         <div class="trending-badge">
-  //           🔥 Trending
-  //         </div>
-  //       ` : ''}
-
-  //       <div class="assessment-image">
-  //         <i class="fas ${assessment.is_premium ? 'fa-crown' : 'fa-book'}"></i>
-  //       </div>
-
-  //       <div class="assessment-content">
-  //         <h3>${assessment.title}</h3>
-  //         <p>${description}</p>
-  //         <div class="assessment-meta">
-  //           <span class="price ${assessment.is_premium ? 'paid' : 'free'}">
-  //             ${assessment.is_premium ? utils.formatCurrency(assessment.price) : 'Free'}
-  //           </span>
-  //           <span class="tag ${assessment.is_premium ? 'tag-paid' : 'tag-free'}">
-  //             ${assessment.is_premium ? 'Premium' : 'Free'}
-  //           </span>
-  //         </div>
-  //         <button class="btn ${assessment.is_premium ? 'btn-accent' : 'btn-primary'} btn-full assessment-button" 
-  //                 data-assessment-id="${assessment.id}">
-  //           View Details
-  //         </button>
-  //       </div>
-  //     </div>
-  //   `;
-  // },
-
   renderAssessmentCard(assessment) {
     // 🧠 Dynamic badge text logic
     let badgeText = "";
@@ -518,7 +404,10 @@ const assessmentsPage = {
     <div class="assessment-card" 
          data-assessment-id="${assessment.id}" 
          data-is-premium="${assessment.is_premium}" 
-         data-skill="${assessment.skill || ''}">
+         data-skill="${assessment.skill || ''}"
+         data-category="${assessment.category || ''}"
+         data-difficulty="${assessment.difficulty || ''}"
+         data-job-role="${assessment.job_role || ''}">
 
       ${badgeText ? `<div class="trending-badge">${badgeIcon} ${badgeText}</div>` : ''}
 

@@ -1,18 +1,57 @@
 const { query } = require('../config/database');
 
 class Result {
+  // static async create(resultData) {
+  //   const { user_id, assessment_id, score, total_questions, time_taken } = resultData;
+    
+  //   const result = await query(
+  //     `INSERT INTO results (user_id, assessment_id, score, total_questions, time_taken) 
+  //      VALUES ($1, $2, $3, $4, $5) 
+  //      RETURNING *`,
+  //     [user_id, assessment_id, score, total_questions, time_taken || 0]
+  //   );
+    
+  //   return result.rows[0];
+  // }
+
   static async create(resultData) {
-    const { user_id, assessment_id, score, total_questions, time_taken } = resultData;
+    const { 
+      user_id, 
+      assessment_id, 
+      score, 
+      total_questions, 
+      time_taken, 
+      status, 
+      percentage, 
+      attempt_number, 
+      certificate_url, 
+      feedback 
+    } = resultData;
     
     const result = await query(
-      `INSERT INTO results (user_id, assessment_id, score, total_questions, time_taken) 
-       VALUES ($1, $2, $3, $4, $5) 
-       RETURNING *`,
-      [user_id, assessment_id, score, total_questions, time_taken || 0]
+      `INSERT INTO results (
+        user_id, assessment_id, score, total_questions, time_taken, 
+        status, percentage, attempt_number, certificate_url, feedback
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING *`,
+      [
+        user_id,
+        assessment_id,
+        score,
+        total_questions,
+        time_taken || 0,
+        status || 'pending',
+        percentage || null,
+        attempt_number || 1,
+        certificate_url || null,
+        feedback || null
+      ]
     );
-    
+
     return result.rows[0];
   }
+
 
   static async findByUserId(userId) {
     const result = await query(`

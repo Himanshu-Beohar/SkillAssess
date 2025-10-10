@@ -576,10 +576,28 @@ const resultController = {
 
       console.log(`✅ Certificate found - Size: ${stats.size} bytes`);
 
+      // res.setHeader('Content-Type', 'application/pdf');
+      // //res.setHeader('Content-Disposition', `attachment; filename="certificate_${result_id}.pdf"`);
+
+      // // Extract the correct filename from certificate_url
+      // const fullFilename = path.basename(result.certificate_url);
+      // res.setHeader('Content-Disposition', `attachment; filename="${fullFilename}"`);
+      // res.setHeader('Content-Length', stats.size);
+      // res.setHeader('Cache-Control', 'no-cache');
+
+      // ✅ Use the filename from certificate_url
+      const downloadName = path.basename(result.certificate_url);
+
+      // Set safe content disposition with UTF-8 support
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="certificate_${result_id}.pdf"`);
-      res.setHeader('Content-Length', stats.size);
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename*=UTF-8''${encodeURIComponent(downloadName)}`
+      );
       res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Content-Length', stats.size);
+      console.log('🎯 Sending Content-Disposition:', res.getHeader('Content-Disposition'));
+
 
       const fileStream = fs.createReadStream(certPath);
       fileStream.pipe(res);

@@ -164,12 +164,32 @@ const assessmentResultPage = {
 
             if (!response.ok) throw new Error('Download failed');
             
+            // const blob = await response.blob();
+            // const url = URL.createObjectURL(blob);
+            // const link = document.createElement('a');
+            // link.href = url;
+            // link.download = `certificate_${this.currentResult.id}.pdf`;
+            // link.click();
+
+            const disposition = response.headers.get('Content-Disposition');
+            let filename = `certificate_${this.currentResult.id}.pdf`;
+
+            // ✅ Extract filename from backend header if available
+            if (disposition && disposition.includes('filename')) {
+            const match = disposition.match(/filename\*?=(?:UTF-8'')?([^;]+)/i);
+            if (match && match[1]) filename = decodeURIComponent(match[1].replace(/['"]/g, '').trim());
+            }
+
             const blob = await response.blob();
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `certificate_${this.currentResult.id}.pdf`;
+            link.download = filename;
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+
             
             setTimeout(() => URL.revokeObjectURL(url), 100);
             utils.hideLoading();

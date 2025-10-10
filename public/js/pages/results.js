@@ -367,20 +367,40 @@ const resultsPage = {
             }
 
             // Create blob and download
-            const blob = await response.blob();
-            console.log('📄 Blob size:', blob.size);
+            // const blob = await response.blob();
+            // console.log('📄 Blob size:', blob.size);
 
-            if (blob.size === 0) {
-            throw new Error('Downloaded file is empty');
+            // if (blob.size === 0) {
+            // throw new Error('Downloaded file is empty');
+            // }
+
+            // const downloadUrl = URL.createObjectURL(blob);
+            // const link = document.createElement('a');
+            // link.href = downloadUrl;
+            // link.download = `certificate_${resultId}.pdf`;
+            // document.body.appendChild(link);
+            // link.click();
+            // document.body.removeChild(link);
+
+            // ✅ Extract filename from backend header
+            const disposition = response.headers.get('Content-Disposition');
+            let filename = `certificate_${resultId}.pdf`;
+            if (disposition && disposition.includes('filename')) {
+            const match = disposition.match(/filename\*?=(?:UTF-8'')?([^;]+)/i);
+            if (match && match[1]) filename = decodeURIComponent(match[1].replace(/['"]/g, '').trim());
             }
 
+            // Now create blob
+            const blob = await response.blob();
             const downloadUrl = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = downloadUrl;
-            link.download = `certificate_${resultId}.pdf`;
+            link.download = filename;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
+
             
             // Clean up
             setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);

@@ -9,6 +9,11 @@ const config = {
         ? 'http://localhost:3000/api' 
         : `${window.location.origin}/api`,
 
+    // Add this for backward compatibility
+    API_URL: window.location.origin.includes('localhost') 
+        ? 'http://localhost:3000' 
+        : window.location.origin,
+
     
     ROUTES: {
         HOME: '/',

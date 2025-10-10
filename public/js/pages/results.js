@@ -183,31 +183,6 @@ const resultsPage = {
         `;
     },
 
-    // calculateSuccessRate() {
-    // if (this.results.length === 0) return { successRate: 0, uniqueTotal: 0, passedCount: 0 };
-
-    // // Track unique assessments → only count once
-    // const assessmentMap = new Map();
-    //     this.results.forEach(result => {
-    //         const percentage = Math.round((result.score / result.total_questions) * 100);
-    //         const passed = percentage >= 60;
-
-    //         // Save best outcome (if passed once, it stays passed)
-    //         if (!assessmentMap.has(result.assessment_id)) {
-    //             assessmentMap.set(result.assessment_id, passed);
-    //         } else if (passed) {
-    //             assessmentMap.set(result.assessment_id, true);
-    //         }
-    //     });
-
-    //     const uniqueTotal = assessmentMap.size;
-    //     const passedCount = Array.from(assessmentMap.values()).filter(passed => passed).length;
-    //     const successRate = uniqueTotal > 0 ? Math.round((passedCount / uniqueTotal) * 100) : 0;
-
-    //     return { successRate, uniqueTotal, passedCount };
-    // },
-
-
     calculateSuccessRate() {
         if (this.results.length === 0) {
             return { successRate: 0, uniqueTotal: 0, uniquePassed: 0, totalPasses: 0, totalAttempts: 0 };
@@ -351,9 +326,144 @@ const resultsPage = {
         }
     },
 
-    downloadCertificate(resultId) {
-        utils.showNotification('Certificate download will be available soon!\nYou will receive certificates through email for now.', 'info');
+    async downloadCertificate(resultId) {
+        try {
+            utils.showLoading('Preparing your certificate...');
+
+            const baseUrl = config.API_BASE_URL.replace('/api', '');
+            const certUrl = `${baseUrl}/api/results/${resultId}/certificate`;
+            const token = auth.getToken();
+
+            console.log('📄 Downloading certificate from:', certUrl);
+
+            const response = await fetch(certUrl, {
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${token}`
+            }
+            });
+
+            // Check if response is OK
+            if (!response.ok) {
+            let errorMessage = 'Unable to download certificate.';
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.error || errorMessage;
+            } catch {
+                errorMessage = response.statusText || errorMessage;
+            }
+            
+            utils.hideLoading();
+            utils.showNotification(errorMessage, 'error');
+            return;
+            }
+
+            // Check if response is actually a PDF
+            const contentType = response.headers.get('content-type');
+            console.log('📄 Response Content-Type:', contentType);
+
+            if (!contentType || !contentType.includes('application/pdf')) {
+            throw new Error('Server returned an error instead of PDF');
+            }
+
+            // Create blob and download
+            const blob = await response.blob();
+            console.log('📄 Blob size:', blob.size);
+
+            if (blob.size === 0) {
+            throw new Error('Downloaded file is empty');
+            }
+
+            const downloadUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `certificate_${resultId}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up
+            setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
+
+            utils.hideLoading();
+            utils.showNotification('Certificate downloaded successfully!', 'success');
+
+        } catch (error) {
+            console.error('❌ Certificate download error:', error);
+            utils.hideLoading();
+            utils.showNotification(error.message || 'Failed to download certificate. Please try again.', 'error');
+        }
     },
+
+
+    // Add this to your results.js for debugging
+    // Updated debug function
+    async debugCertificateDownload(resultId) {
+        try {
+            console.log('🔍 Debugging certificate download...');
+            
+            // Use the base URL without /api since routes already include it
+            const baseUrl = config.API_BASE_URL.replace('/api', '');
+            console.log('🌐 Using base URL:', baseUrl);
+            
+            // Test routes with correct URLs (no double /api)
+            const routes = [
+            `${baseUrl}/api/results/${resultId}/certificate`,
+            `${baseUrl}/api/results/certificate-file/certificate_2_32_1760010833055.pdf`,
+            `${baseUrl}/certificates/certificate_2_32_1760010833055.pdf`
+            ];
+
+            for (const route of routes) {
+            console.log(`\n🧪 Testing route: ${route}`);
+            
+            const token = auth.getToken();
+
+            try {
+                const response = await fetch(route, {
+                method: 'GET',
+                headers: route.includes('/api/results/') ? { 
+                    'Authorization': `Bearer ${token}`
+                } : {}
+                });
+
+                console.log(`📊 Response status: ${response.status}`);
+                console.log('📋 Response headers:', Object.fromEntries(response.headers.entries()));
+                
+                const contentType = response.headers.get('content-type');
+                console.log('📄 Content-Type:', contentType);
+                
+                // Clone response to read as text without consuming it
+                const cloneResponse = response.clone();
+                const text = await cloneResponse.text();
+                
+                if (text.includes('<!DOCTYPE html>') || text.includes('<html')) {
+                console.log('❌ THIS ROUTE IS RETURNING INDEX.HTML');
+                console.log('📝 Response content (first 200 chars):', text.substring(0, 200));
+                } else if (contentType && contentType.includes('application/pdf')) {
+                console.log('✅ THIS ROUTE RETURNS A PDF!');
+                const blob = await response.blob();
+                console.log('📄 Blob size:', blob.size);
+                } else if (contentType && contentType.includes('application/json')) {
+                console.log('📝 JSON Response:', JSON.parse(text));
+                } else {
+                console.log('❓ UNKNOWN RESPONSE TYPE');
+                console.log('📝 Response content (first 200 chars):', text.substring(0, 200));
+                }
+                
+            } catch (error) {
+                console.log('❌ Request failed:', error.message);
+            }
+            }
+            
+        } catch (error) {
+            console.error('Debug error:', error);
+        }
+        },
+
+// Temporarily use this in your renderResultCard:
+// onclick="event.stopPropagation(); resultsPage.debugCertificateDownload(${result.id})"
+
+    
 
     showEmptyState() {
         const html = `
